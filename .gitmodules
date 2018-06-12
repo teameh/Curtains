@@ -1,0 +1,3 @@
+[submodule "lib/Arduino-SerialCommand"]
+	path = lib/Arduino-SerialCommand
+	url = git@github.com:kroimon/Arduino-SerialCommand.git
