@@ -1,20 +1,23 @@
 #include <Arduino.h>
-// https://github.com/luni64/TeensyStep
-#include <StepControl.h>
+// http://www.airspayce.com/mikem/arduino/AccelStepper/
+#include <AccelStepper.h>
 // https://github.com/kroimon/Arduino-SerialCommand
 #include <SerialCommand.h>
 
-#define motorStepPin 2
-#define motorDirPin 3
-#define motorOnOffPin 4
+#define motorStepPin 4
+#define motorDirPin 5
+#define motorOnOffPin 16
+#define switchOffPin 14
 
 #define defaultSpeed 6400
 #define defaultStartSpeed 1600
 #define defaultAcceleration 1600
 
-Stepper motor(motorStepPin, motorDirPin);
-StepControl<> controller;
+AccelStepper motor(AccelStepper::DRIVER, motorStepPin, motorDirPin);
 SerialCommand sCmd;
+
+bool isRotating = false;
+
 
 // ---------------- params -----------------
 
@@ -34,12 +37,12 @@ void setNextParamAsMaxSpeed() {
   motor.setMaxSpeed(value);
 }
 
-void setNextParamAsStartSpeed() {
-  int value = getParam();
-  Serial.print("motor.setPullInSpeed: ");
-  Serial.println(value);
-  motor.setPullInSpeed(value);
-}
+// void setNextParamAsStartSpeed() {
+//   int value = getParam();
+//   Serial.print("motor.setPullInSpeed: ");
+//   Serial.println(value);
+//   motor.setPullInSpeed(value);
+// }
 
 void setNextParamAsAcceleration() {
   int value = getParam();
@@ -50,7 +53,7 @@ void setNextParamAsAcceleration() {
 
 void setDefaultParams() {
   motor.setMaxSpeed(defaultSpeed);
-  motor.setPullInSpeed(defaultStartSpeed);
+//   motor.setPullInSpeed(defaultStartSpeed);
   motor.setAcceleration(defaultAcceleration);
 }
 
@@ -62,8 +65,8 @@ void motorOn() {
 }
 
 void motorOff() {
-  Serial.println("turn motor off");
-  digitalWrite(motorOnOffPin, LOW);
+  // Serial.println("turn motor off");
+  // digitalWrite(motorOnOffPin, LOW);
 }
 
 // ----------------- Commands -----------------
@@ -76,34 +79,56 @@ void unrecognizedCommand(const char *command) {
 void setSettings() {
   Serial.println("- setSettings");  
   setNextParamAsMaxSpeed();
-  setNextParamAsStartSpeed();
+//   setNextParamAsStartSpeed();
   setNextParamAsAcceleration();
 }
 
 void startRotation() {
   Serial.println("- startRotation");
-  motorOn();
-  controller.rotateAsync(motor);
+  Serial.println("motor.run: 999999");
+  motor.moveTo(999999);
 }
 
 void stopRotation() {
   Serial.println("- stopRotation");
-  controller.stop();
-  motorOff();
+  Serial.println("motor.stop");
+  motor.stop();
 }
 
 void rotateSteps() {
   Serial.println("- rotateSteps");
-  
-  motorOn();
 
   int steps = getParam();
-  Serial.print("motor.setTargetRel: ");
+  Serial.print("motor.moveTo: ");
   Serial.println(steps);
-  motor.setTargetRel(steps);
-  controller.move(motor);
+  motor.moveTo(steps);
+}
 
-  motorOff();
+// ----------------- Loop Helpers -----------------
+
+void checkSwitch() {
+  // // read the state of the switch button
+  if(digitalRead(switchOffPin) == HIGH && motor.isRunning()) {
+    Serial.println("Switch was triggered, motor was on");
+  } 
+
+  Serial.println("checkSwitch");
+
+  Serial.print(" 14 ");
+  Serial.print(digitalRead(14));
+  Serial.print(" ");
+
+}
+
+void rotateIfNeeded() {
+  if (motor.distanceToGo() != 0) {
+    motor.run();
+    isRotating = true;
+    Serial.println(motor.distanceToGo());
+  } else if(isRotating) {
+    isRotating = false
+    Serial.println("- Done running. Motor stops");
+  }
 }
 
 // ----------------- Setup -----------------
@@ -120,7 +145,8 @@ void setup(){
   sCmd.addCommand("ROTATE_X_STEPS", rotateSteps);
   sCmd.setDefaultHandler(unrecognizedCommand);
 
-  motorOff();
+  setDefaultParams();
+  motorOn();
 
   Serial.println("- Setup end");
 }
@@ -128,4 +154,7 @@ void setup(){
 void loop() {
   // check for new commands the whole time
   sCmd.readSerial();
+
+  // checkSwitch();
+  rotateIfNeeded();
 }
