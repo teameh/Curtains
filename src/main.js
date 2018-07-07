@@ -10,7 +10,7 @@ const parser = new SerialPort.parsers.Readline({
 });
 
 var port = new SerialPort("/dev/cu.SLAB_USBtoUART", {
-  baudRate: 9600
+  baudRate: 115200
 });
 
 port.pipe(parser);

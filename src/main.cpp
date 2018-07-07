@@ -1,11 +1,28 @@
 #include <Arduino.h>
+
 // http://www.airspayce.com/mikem/arduino/AccelStepper/
 #include <AccelStepper.h>
+
 // https://github.com/kroimon/Arduino-SerialCommand
 #include <SerialCommand.h>
 
+// https://github.com/esp8266/Arduino
+#include <ESP8266WiFi.h>
+
+
+
+
+
+
+
+
+
+
+// ###################################################
+// ################# Motor code ######################
+// ###################################################
+
 // Pins on the Huzzah microcontroller
-#define ledPin 0
 #define motorStepPin 4
 #define motorDirPin 5
 #define motorOnOffPin 16
@@ -16,8 +33,6 @@
 #define defaultAcceleration 1000
 
 SerialCommand sCmd;
-
-// ################# Motor code #################
 
 AccelStepper motor(AccelStepper::DRIVER, motorStepPin, motorDirPin);
 int loopCounter = 0;
@@ -73,7 +88,7 @@ void unrecognizedCommand(const char *command) {
 }
 
 void setSpeed() {
-  Serial.println("- setSettings");  
+  Serial.println("- setSpeed");  
   setNextParamAsMaxSpeed();
 }
 
@@ -183,15 +198,150 @@ void loopMotor()
     // checkSwitch();
 }
 
-// ################# Main #################
+
+
+
+
+
+
+
+
+
+
+// ###################################################
+// ################# Wifi code ######################
+// ###################################################
+
+const char* ssid     = "H369AB21CAF";
+const char* password = "9DA66C3A229E";
+
+// Create an instance of the server
+// specify the port to listen on as an argument
+WiFiServer server(80);
+
+void setupWifi() {
+  // Connect to WiFi network
+  Serial.println();
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(100);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+
+  // Start the server
+  server.begin();
+  Serial.println("Server started");
+
+  // Print the IP address
+  Serial.println(WiFi.localIP());
+}
+
+void loopWiFi() {
+  // Check if a client has connected
+  WiFiClient client = server.available();
+  if (!client) {
+    return;
+  }
+
+  // Wait until the client sends some data
+  Serial.println("new client");
+  while (!client.available()) {
+    delay(1);
+  }
+
+  // Read the first line of the request
+  String req = client.readStringUntil('\r');
+  Serial.println(req);
+  client.flush();
+
+  String reqPrefix = "/steps/";
+  int prefixIndex = req.indexOf(reqPrefix);
+
+  // Match the request
+  if (prefixIndex == -1) {
+    Serial.println("invalid request");
+    client.stop();
+    return;
+  }
+
+  int slashIndex0 = req.indexOf('/', prefixIndex + reqPrefix.length());
+  String steps = "";
+  if(slashIndex0 != -1) {
+    steps = req.substring(prefixIndex + reqPrefix.length(), slashIndex0);
+    motor.enableOutputs();
+    motor.setCurrentPosition(0);
+    motor.moveTo(steps.toInt());
+  }
+
+  int slashIndex1 = req.indexOf('/', slashIndex0+1);
+  String speed = "";
+  if(slashIndex1 != -1) {
+    speed = req.substring(slashIndex0+1, slashIndex1);
+    motor.setMaxSpeed(speed.toInt());
+  }
+
+  int slashIndex2 = req.indexOf('/', slashIndex1+1);
+  String acceleration = "";
+  if(slashIndex2 != -1) {
+    acceleration = req.substring(slashIndex1+1, slashIndex2);
+    motor.setAcceleration(acceleration.toInt());
+  }
+
+  client.flush();
+
+  // Prepare the response
+  String nl = "\r\n";
+  String s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML><html>" + nl;
+  s += nl + "<h1>Rotate!</h1>" ;
+  s += nl + "<pre><code>";
+  s += nl + "req: " + req + " ";
+  s += nl;
+  s += nl + "slashIndex0: " + slashIndex0 + " ";
+  s += nl + "slashIndex1: " + slashIndex1 + " ";
+  s += nl + "slashIndex2: " + slashIndex2 + " ";
+  s += nl;
+  s += nl + "steps: " + steps + " ";
+  s += nl + "speed: " + speed + " ";
+  s += nl + "acceleration: " + acceleration + " ";
+  s += nl + "</pre></code>";
+  s += nl + "</html>\n";
+
+  // Send the response to the client
+  client.print(s);
+  delay(1);
+  Serial.println("Client disonnected");
+
+  // The client will actually be disconnected
+  // when the function returns and 'client' object is detroyed
+}
+
+
+
+
+
+
+// ###################################################
+// ################# Main ############################
+// ###################################################
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   sCmd.setDefaultHandler(unrecognizedCommand);
 
   setupMotor();
+  setupWifi();
 }
 
 void loop() {
   loopMotor();
+  loopWiFi();
 }
