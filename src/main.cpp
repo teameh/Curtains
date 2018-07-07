@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <TimeLib.h>
 
 // http://www.airspayce.com/mikem/arduino/AccelStepper/
 #include <AccelStepper.h>
@@ -204,16 +205,14 @@ void loopMotor()
 
 
 
-
-
-
-
 // ###################################################
 // ################# Wifi code ######################
 // ###################################################
 
 const char* ssid     = "H369AB21CAF";
 const char* password = "9DA66C3A229E";
+int stepsToPerformLater = 0;
+time_t timeToPerformSteps = 0;
 
 // Create an instance of the server
 // specify the port to listen on as an argument
@@ -245,6 +244,8 @@ void setupWifi() {
   Serial.println(WiFi.localIP());
 }
 
+void checkRequestForStepsCommand (WiFiClient client, String req);
+
 void loopWiFi() {
   // Check if a client has connected
   WiFiClient client = server.available();
@@ -263,8 +264,18 @@ void loopWiFi() {
   Serial.println(req);
   client.flush();
 
+  checkRequestForStepsCommand(client, req);
+  
+  Serial.println("Client disonnected");
+
+  // The client will actually be disconnected
+  // when the function returns and 'client' object is detroyed
+}
+
+void checkRequestForStepsCommand (WiFiClient client, String req) {
   String reqPrefix = "/steps/";
   int prefixIndex = req.indexOf(reqPrefix);
+  time_t currentTime = now();
 
   // Match the request
   if (prefixIndex == -1) {
@@ -274,59 +285,51 @@ void loopWiFi() {
   }
 
   int slashIndex0 = req.indexOf('/', prefixIndex + reqPrefix.length());
-  String steps = "";
   if(slashIndex0 != -1) {
-    steps = req.substring(prefixIndex + reqPrefix.length(), slashIndex0);
-    motor.enableOutputs();
-    motor.setCurrentPosition(0);
-    motor.moveTo(steps.toInt());
+    stepsToPerformLater = req.substring(prefixIndex + reqPrefix.length(), slashIndex0).toInt();
   }
 
   int slashIndex1 = req.indexOf('/', slashIndex0+1);
-  String speed = "";
+  int speed = 0;
   if(slashIndex1 != -1) {
-    speed = req.substring(slashIndex0+1, slashIndex1);
-    motor.setMaxSpeed(speed.toInt());
+    speed = req.substring(slashIndex0+1, slashIndex1).toInt();
+    motor.setMaxSpeed(speed);
   }
 
   int slashIndex2 = req.indexOf('/', slashIndex1+1);
-  String acceleration = "";
+  int acceleration = 0;
   if(slashIndex2 != -1) {
-    acceleration = req.substring(slashIndex1+1, slashIndex2);
-    motor.setAcceleration(acceleration.toInt());
+    acceleration = req.substring(slashIndex1+1, slashIndex2).toInt();
+    motor.setAcceleration(acceleration);
+  }
+
+  int slashIndex3 = req.indexOf('/', slashIndex2+1);
+  int stepsDelay = 0;
+  if(slashIndex3 != -1) {
+    stepsDelay = req.substring(slashIndex2+1, slashIndex3).toInt();
+    timeToPerformSteps = currentTime + stepsDelay;
   }
 
   client.flush();
 
   // Prepare the response
   String nl = "\r\n";
-  String s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML><html>" + nl;
-  s += nl + "<h1>Rotate!</h1>" ;
-  s += nl + "<pre><code>";
-  s += nl + "req: " + req + " ";
-  s += nl;
-  s += nl + "slashIndex0: " + slashIndex0 + " ";
-  s += nl + "slashIndex1: " + slashIndex1 + " ";
-  s += nl + "slashIndex2: " + slashIndex2 + " ";
-  s += nl;
-  s += nl + "steps: " + steps + " ";
-  s += nl + "speed: " + speed + " ";
-  s += nl + "acceleration: " + acceleration + " ";
-  s += nl + "</pre></code>";
-  s += nl + "</html>\n";
+  String s = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n";
+  s += "Access-Control-Allow-Origin: *\r\n";
+  s += nl + "{";
+  s += nl + "    \"req\": \"" + req + "\",";
+  s += nl + "    \"currentTime\": "+ currentTime + ",";
+  s += nl + "    \"stepsDelay\": " + stepsDelay + ",";
+  s += nl + "    \"timeToPerformSteps\": " + timeToPerformSteps + ",";
+  s += nl + "    \"stepsToPerformLater\": " + stepsToPerformLater + ",";
+  s += nl + "    \"speed\": " + speed + ",";
+  s += nl + "    \"acceleration\": " + acceleration;
+  s += nl + "}\n";
 
   // Send the response to the client
   client.print(s);
   delay(1);
-  Serial.println("Client disonnected");
-
-  // The client will actually be disconnected
-  // when the function returns and 'client' object is detroyed
 }
-
-
-
-
 
 
 // ###################################################
@@ -344,4 +347,14 @@ void setup() {
 void loop() {
   loopMotor();
   loopWiFi();
+
+  // Check if we need to rotate now:
+  if(now() == timeToPerformSteps && stepsToPerformLater > 0) {
+    Serial.print("Time to wake up, start rotating:");
+    Serial.println(stepsToPerformLater);
+    timeToPerformSteps = 0;
+    motor.enableOutputs();
+    motor.setCurrentPosition(0);
+    motor.moveTo(stepsToPerformLater);
+  }
 }

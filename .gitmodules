@@ -1,3 +1,6 @@
 [submodule "lib/Arduino-SerialCommand"]
 	path = lib/Arduino-SerialCommand
 	url = git@github.com:kroimon/Arduino-SerialCommand.git
+[submodule "lib/time"]
+	path = lib/time
+	url = git@github.com:PaulStoffregen/Time.git
