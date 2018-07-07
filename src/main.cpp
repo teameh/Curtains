@@ -4,20 +4,24 @@
 // https://github.com/kroimon/Arduino-SerialCommand
 #include <SerialCommand.h>
 
+// Pins on the Huzzah microcontroller
+#define ledPin 0
 #define motorStepPin 4
 #define motorDirPin 5
 #define motorOnOffPin 16
-#define switchOffPin 14
+#define switchPin 14
 
-#define defaultSpeed 6400
-#define defaultStartSpeed 1600
-#define defaultAcceleration 1600
+// Default settings
+#define defaultSpeed 1000
+#define defaultAcceleration 1000
 
-AccelStepper motor(AccelStepper::DRIVER, motorStepPin, motorDirPin);
 SerialCommand sCmd;
 
-bool isRotating = false;
+// ################# Motor code #################
 
+AccelStepper motor(AccelStepper::DRIVER, motorStepPin, motorDirPin);
+int loopCounter = 0;
+int switchValue = LOW;
 
 // ---------------- params -----------------
 
@@ -37,13 +41,6 @@ void setNextParamAsMaxSpeed() {
   motor.setMaxSpeed(value);
 }
 
-// void setNextParamAsStartSpeed() {
-//   int value = getParam();
-//   Serial.print("motor.setPullInSpeed: ");
-//   Serial.println(value);
-//   motor.setPullInSpeed(value);
-// }
-
 void setNextParamAsAcceleration() {
   int value = getParam();
   Serial.print("motor.setAcceleration: ");
@@ -53,20 +50,19 @@ void setNextParamAsAcceleration() {
 
 void setDefaultParams() {
   motor.setMaxSpeed(defaultSpeed);
-//   motor.setPullInSpeed(defaultStartSpeed);
   motor.setAcceleration(defaultAcceleration);
 }
 
 // ----------------- Helpers -----------------
 
 void motorOn() {
-  Serial.println("turn motor on");
-  digitalWrite(motorOnOffPin, HIGH);
+  Serial.println("turn motor on");  
+  motor.enableOutputs();
 }
 
 void motorOff() {
-  // Serial.println("turn motor off");
-  // digitalWrite(motorOnOffPin, LOW);
+  Serial.println("turn motor off");  
+  motor.disableOutputs();
 }
 
 // ----------------- Commands -----------------
@@ -76,27 +72,29 @@ void unrecognizedCommand(const char *command) {
   Serial.println(command);
 }
 
-void setSettings() {
+void setSpeed() {
   Serial.println("- setSettings");  
   setNextParamAsMaxSpeed();
-//   setNextParamAsStartSpeed();
+}
+
+void setAcceleration() {
+  Serial.println("- setAcceleration");  
   setNextParamAsAcceleration();
 }
 
-void startRotation() {
-  Serial.println("- startRotation");
-  Serial.println("motor.run: 999999");
-  motor.moveTo(999999);
-}
-
-void stopRotation() {
-  Serial.println("- stopRotation");
+void stop() {
+  Serial.println("- stop");
   Serial.println("motor.stop");
+
+  // motor.moveTo(motor.currentPosition());
   motor.stop();
 }
 
 void rotateSteps() {
   Serial.println("- rotateSteps");
+
+  motor.enableOutputs();
+  motor.setCurrentPosition(0);
 
   int steps = getParam();
   Serial.print("motor.moveTo: ");
@@ -104,57 +102,96 @@ void rotateSteps() {
   motor.moveTo(steps);
 }
 
+void rotateFixedSteps() {
+  Serial.println("- rotateFixedSteps");
+
+  motor.enableOutputs();
+  motor.setCurrentPosition(0);
+
+  Serial.print("motor.moveTo: ");
+  motor.moveTo(2000);
+}
+
 // ----------------- Loop Helpers -----------------
 
+
+void printSwitchValue(int switchValue) {
+    if (switchValue == HIGH) {
+      Serial.println("switchPin == HIGH");
+    }
+  
+    if (switchValue == LOW) {
+      Serial.println("switchPin == LOW");
+    }
+}
+
 void checkSwitch() {
-  // // read the state of the switch button
-  if(digitalRead(switchOffPin) == HIGH && motor.isRunning()) {
-    Serial.println("Switch was triggered, motor was on");
-  } 
+  // int oldValue = switchValue;
 
-  Serial.println("checkSwitch");
+  switchValue = digitalRead(switchPin);
+  digitalWrite(0, switchValue);
 
-  Serial.print(" 14 ");
-  Serial.print(digitalRead(14));
-  Serial.print(" ");
+  // if(oldValue != switchValue) {
+  //   printSwitchValue(switchValue);
+  // }
 
-}
-
-void rotateIfNeeded() {
-  if (motor.distanceToGo() != 0) {
-    motor.run();
-    isRotating = true;
-    Serial.println(motor.distanceToGo());
-  } else if(isRotating) {
-    isRotating = false
-    Serial.println("- Done running. Motor stops");
+  Serial.print("pins: ");
+  for (int i = 0; i < 20; i++) {
+    Serial.print(" ");
+    Serial.print(digitalRead(i));
   }
+  Serial.println(" ");
+  
+  // printSwitchValue(switchValue);
 }
-
 // ----------------- Setup -----------------
 
-void setup(){
+void setupMotor(){
+    Serial.println("- Setup start");
+
+    pinMode(0, OUTPUT);
+    pinMode(motorStepPin, OUTPUT);
+
+    motor.setEnablePin(motorOnOffPin);
+    setDefaultParams();
+
+    sCmd.addCommand("STEPS", rotateSteps);
+
+    sCmd.addCommand("MOTOR_ON", motorOn);
+    sCmd.addCommand("MOTOR_OFF", motorOff);
+
+    sCmd.addCommand("SPEED", setSpeed);
+    sCmd.addCommand("ACCEL", setAcceleration);
+
+    sCmd.addCommand("STOP", stop);
+
+    Serial.println("- Setup end");
+}
+
+void loopMotor()
+{    
+    // Read commands
+    sCmd.readSerial();
+
+    // Auto turn motor off when it's done
+    if (motor.distanceToGo() == 0) {
+	    motor.disableOutputs();
+    }
+
+    motor.run();
+    
+    // checkSwitch();
+}
+
+// ################# Main #################
+
+void setup() {
   Serial.begin(9600);
-  Serial.println("- Setup start");
-
-  pinMode(motorStepPin, OUTPUT);
-
-  sCmd.addCommand("SET_SETTINGS", setSettings);
-  sCmd.addCommand("START_ROTATION", startRotation);
-  sCmd.addCommand("STOP_ROTATION", stopRotation);
-  sCmd.addCommand("ROTATE_X_STEPS", rotateSteps);
   sCmd.setDefaultHandler(unrecognizedCommand);
 
-  setDefaultParams();
-  motorOn();
-
-  Serial.println("- Setup end");
+  setupMotor();
 }
 
 void loop() {
-  // check for new commands the whole time
-  sCmd.readSerial();
-
-  // checkSwitch();
-  rotateIfNeeded();
+  loopMotor();
 }
