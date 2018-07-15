@@ -68,7 +68,7 @@ class SunriseController: RequestController {
         Alamofire.request(url, parameters: parameters)
             .validate()
             .responseJSON { response in
-                print("request \(response.response!.statusCode) - \(response.request!.url!) \(String(describing: response.result.value))");
+//                print("request \(response.response!.statusCode) - \(response.request!.url!) \(String(describing: response.result.value))");
 
                 switch response.result {
                 case .success:

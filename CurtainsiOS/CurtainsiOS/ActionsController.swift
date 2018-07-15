@@ -38,7 +38,7 @@ class ActionsController: RequestController {
         Alamofire.request(url)
             .validate()
             .responseJSON { response in
-                print("request \(response.response!.statusCode) - \(response.request!.url!) \(String(describing: response.result.value))");
+//                print("request \(response.response!.statusCode) - \(response.request!.url!) \(String(describing: response.result.value))");
 
                 switch response.result {
                 case .success:
@@ -57,7 +57,7 @@ class ActionsController: RequestController {
             .validate()
             .responseJSON { response in
 
-                print("request \(response.response!.statusCode) - \(response.request!.url!) \(String(describing: response.result.value))");
+//                print("request \(response.response!.statusCode) - \(response.request!.url!) \(String(describing: response.result.value))");
 
                 switch response.result {
                 case .success:
