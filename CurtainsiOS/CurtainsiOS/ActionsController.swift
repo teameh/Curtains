@@ -9,10 +9,8 @@
 import UIKit
 import Alamofire
 
-class ActionsController: UIViewController {
-    
-    @IBOutlet weak var retryButton: UIButton!
-    
+class ActionsController: RequestController {
+
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -34,7 +32,7 @@ class ActionsController: UIViewController {
     }
     
     @IBAction func onStop(_ sender: Any) {
-        self.setButtonLoading(title: "Loading...")
+        self.onLoading(status: "Loading...")
         
         let url = "http://192.168.2.22/stop/";
         Alamofire.request(url)
@@ -44,16 +42,15 @@ class ActionsController: UIViewController {
                 
                 switch response.result {
                 case .success:
-                    self.retryButton.setTitle("Stopping...", for: .normal)
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(10)) { self.disableRetryButton() }
-                case .failure:
-                    self.enableButton(title: "Stopping failed... Retry?", action: #selector(self.onStop(_:)))
+                    self.onSuccess(status: "Stopping motor")
+                case .failure(let err):
+                    self.onFailure(status: "Request failed... \(err.localizedDescription)", action: #selector(self.onStop(_:)))
                 }
         }
     }
     
     func sendOpenRequest(steps: Steps, onRetry: Selector) {
-        self.setButtonLoading(title: "Loading...")
+        self.onLoading(status: "Loading...")
         
         let url = "http://192.168.2.22/open/\(steps.rawValue)/";
         Alamofire.request(url)
@@ -63,28 +60,10 @@ class ActionsController: UIViewController {
                 
                 switch response.result {
                 case .success:
-                    self.retryButton.setTitle("Opening...", for: .normal)
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(10)) { self.disableRetryButton() }
-                    self.retryButton.setTitle("Opening...", for: .normal)
-                case .failure:
-                    self.enableButton(title: "Opening failed... Retry?", action: onRetry)
+                    self.onSuccess(status: "Opening curtain!")
+                case .failure(let err):
+                    self.onFailure(status: "Request failed... \(err.localizedDescription)", action: onRetry)
                 }
         }
-    }
-    
-    func disableRetryButton() {
-        self.retryButton.isEnabled = false
-        self.retryButton.alpha = 0
-    }
-    
-    func setButtonLoading(title: String) {
-        self.retryButton.setTitle(title, for: .normal)
-        self.retryButton.removeTarget(nil, action: nil, for: .allEvents)
-    }
-    
-    func enableButton(title: String, action: Selector) {
-        self.retryButton.setTitle(title, for: .normal)
-        self.retryButton.removeTarget(nil, action: nil, for: .allEvents)
-        self.retryButton.addTarget(self, action: action, for: .touchUpInside)
     }
 }
