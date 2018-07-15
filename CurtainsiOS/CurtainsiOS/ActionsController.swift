@@ -34,6 +34,8 @@ class ActionsController: UIViewController {
     }
     
     @IBAction func onStop(_ sender: Any) {
+        self.setButtonLoading(title: "Loading...")
+        
         let url = "http://192.168.2.22/stop/";
         Alamofire.request(url)
             .validate()
@@ -51,6 +53,8 @@ class ActionsController: UIViewController {
     }
     
     func sendOpenRequest(steps: Steps, onRetry: Selector) {
+        self.setButtonLoading(title: "Loading...")
+        
         let url = "http://192.168.2.22/open/\(steps.rawValue)/";
         Alamofire.request(url)
             .validate()
@@ -73,8 +77,14 @@ class ActionsController: UIViewController {
         self.retryButton.alpha = 0
     }
     
+    func setButtonLoading(title: String) {
+        self.retryButton.setTitle(title, for: .normal)
+        self.retryButton.removeTarget(nil, action: nil, for: .allEvents)
+    }
+    
     func enableButton(title: String, action: Selector) {
         self.retryButton.setTitle(title, for: .normal)
+        self.retryButton.removeTarget(nil, action: nil, for: .allEvents)
         self.retryButton.addTarget(self, action: action, for: .touchUpInside)
     }
 }

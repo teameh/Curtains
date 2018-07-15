@@ -207,7 +207,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EYG-zN-nYU">
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EYG-zN-nYU">
                                 <rect key="frame" x="16" y="90" width="343" height="50"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -219,7 +219,7 @@
                                     <action selector="onOpenFull:" destination="mFV-OF-a8L" eventType="touchUpInside" id="bNh-7V-43A"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d9h-I0-bHs">
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d9h-I0-bHs">
                                 <rect key="frame" x="16" y="160" width="343" height="50"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -231,7 +231,7 @@
                                     <action selector="onOpen34:" destination="mFV-OF-a8L" eventType="touchUpInside" id="2zH-tQ-vJE"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rSB-ie-VB0">
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rSB-ie-VB0">
                                 <rect key="frame" x="16" y="232" width="343" height="50"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -243,7 +243,7 @@
                                     <action selector="onOpen12:" destination="mFV-OF-a8L" eventType="touchUpInside" id="5pY-fN-BZu"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9i0-U4-4dn">
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9i0-U4-4dn">
                                 <rect key="frame" x="17" y="307" width="343" height="50"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -255,7 +255,7 @@
                                     <action selector="onOpen14:" destination="mFV-OF-a8L" eventType="touchUpInside" id="fSD-0q-zbc"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mzw-Zg-n4m">
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mzw-Zg-n4m">
                                 <rect key="frame" x="16" y="383" width="343" height="50"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -281,10 +281,6 @@
                                 <state key="normal" title="Retry">
                                     <color key="titleColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                                 </state>
-                                <connections>
-                                    <action selector="onRetry:" destination="mFV-OF-a8L" eventType="touchUpInside" id="tSK-K3-kyO"/>
-                                    <action selector="onSave:" destination="XCz-SB-x1F" eventType="touchUpInside" id="wk6-U7-IPT"/>
-                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
