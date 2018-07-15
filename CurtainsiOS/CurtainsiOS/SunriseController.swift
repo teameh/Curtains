@@ -13,8 +13,8 @@ class SunriseController: UIViewController {
     @IBOutlet weak var `switch`: UISwitch!
     @IBOutlet weak var timePicker: UIDatePicker!
     @IBOutlet weak var amountPicker: UISegmentedControl!
-    @IBOutlet weak var statusLabel: UILabel!
     
+    @IBOutlet weak var retryButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -31,5 +31,8 @@ class SunriseController: UIViewController {
     
     @IBAction func onChangeAmount(_ sender: UISegmentedControl) {
         
+    }
+    
+    @IBAction func onRetry(_ sender: Any) {
     }
 }

@@ -14,6 +14,9 @@
 		5267CA8F20FB4D0E0049DB5B /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA8D20FB4D0E0049DB5B /* SettingsController.swift */; };
 		5267CA9120FB4D1B0049DB5B /* ActionsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA9020FB4D1B0049DB5B /* ActionsController.swift */; };
 		5267CA9220FB4D1B0049DB5B /* ActionsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA9020FB4D1B0049DB5B /* ActionsController.swift */; };
+		5267CA9420FB540F0049DB5B /* Steps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA9320FB540F0049DB5B /* Steps.swift */; };
+		5267CA9520FB540F0049DB5B /* Steps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA9320FB540F0049DB5B /* Steps.swift */; };
+		5267CA9620FB540F0049DB5B /* Steps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA9320FB540F0049DB5B /* Steps.swift */; };
 		527840EE20F1649F00E05246 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527840ED20F1649F00E05246 /* AppDelegate.swift */; };
 		527840F020F1649F00E05246 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527840EF20F1649F00E05246 /* ViewController.swift */; };
 		527840F320F1649F00E05246 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 527840F120F1649F00E05246 /* Main.storyboard */; };
@@ -49,6 +52,7 @@
 		5267CA8A20FB4D000049DB5B /* SunriseController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunriseController.swift; sourceTree = "<group>"; };
 		5267CA8D20FB4D0E0049DB5B /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		5267CA9020FB4D1B0049DB5B /* ActionsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionsController.swift; sourceTree = "<group>"; };
+		5267CA9320FB540F0049DB5B /* Steps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Steps.swift; sourceTree = "<group>"; };
 		527840EA20F1649F00E05246 /* CurtainsiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CurtainsiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		527840ED20F1649F00E05246 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		527840EF20F1649F00E05246 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -132,6 +136,7 @@
 				527840F420F164A100E05246 /* Assets.xcassets */,
 				527840F620F164A100E05246 /* LaunchScreen.storyboard */,
 				527840F920F164A100E05246 /* Info.plist */,
+				5267CA9320FB540F0049DB5B /* Steps.swift */,
 			);
 			path = CurtainsiOS;
 			sourceTree = "<group>";
@@ -390,6 +395,7 @@
 				5267CA8E20FB4D0E0049DB5B /* SettingsController.swift in Sources */,
 				527840F020F1649F00E05246 /* ViewController.swift in Sources */,
 				5267CA8B20FB4D000049DB5B /* SunriseController.swift in Sources */,
+				5267CA9420FB540F0049DB5B /* Steps.swift in Sources */,
 				527840EE20F1649F00E05246 /* AppDelegate.swift in Sources */,
 				5267CA9120FB4D1B0049DB5B /* ActionsController.swift in Sources */,
 			);
@@ -400,6 +406,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5278410320F164A200E05246 /* CurtainsiOSTests.swift in Sources */,
+				5267CA9520FB540F0049DB5B /* Steps.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -408,6 +415,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5267CA8F20FB4D0E0049DB5B /* SettingsController.swift in Sources */,
+				5267CA9620FB540F0049DB5B /* Steps.swift in Sources */,
 				5278410E20F164A200E05246 /* CurtainsiOSUITests.swift in Sources */,
 				5267CA8C20FB4D000049DB5B /* SunriseController.swift in Sources */,
 				5267CA9220FB4D1B0049DB5B /* ActionsController.swift in Sources */,

@@ -46,13 +46,6 @@
                                     <action selector="onChangeTime:" destination="uoQ-bc-deq" eventType="valueChanged" id="zrT-9w-flF"/>
                                 </connections>
                             </datePicker>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Loading..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vvq-AE-t1K">
-                                <rect key="frame" x="16" y="544" width="343" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
-                                <color key="textColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="xcV-IJ-EUd">
                                 <rect key="frame" x="16" y="266" width="343" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -67,6 +60,18 @@
                                     <action selector="onChangeAmount:" destination="uoQ-bc-deq" eventType="valueChanged" id="Ntr-T2-mBM"/>
                                 </connections>
                             </segmentedControl>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MSW-le-PLg">
+                                <rect key="frame" x="16" y="543" width="343" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                <state key="normal" title="Retry">
+                                    <color key="titleColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="onRetry:" destination="uoQ-bc-deq" eventType="touchUpInside" id="6Tv-pS-BLb"/>
+                                    <action selector="onSave:" destination="XCz-SB-x1F" eventType="touchUpInside" id="51h-L1-4vB"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
                         <viewLayoutGuide key="safeArea" id="nUi-Cy-NsI"/>
@@ -77,7 +82,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="amountPicker" destination="xcV-IJ-EUd" id="9fi-2a-Cv9"/>
-                        <outlet property="statusLabel" destination="vvq-AE-t1K" id="vhb-tO-9Hx"/>
+                        <outlet property="retryButton" destination="MSW-le-PLg" id="dBY-AL-XEu"/>
                         <outlet property="switch" destination="hvS-Pi-TkU" id="3gP-UT-q0n"/>
                         <outlet property="timePicker" destination="Y0P-Qe-4oq" id="oM1-qr-zdM"/>
                     </connections>
@@ -139,18 +144,6 @@
                                 <color key="textColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2Fv-UM-1Pv">
-                                <rect key="frame" x="22" y="559" width="343" height="50"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.83921568629999999" green="0.51764705879999995" blue="0.23921568630000001" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <state key="normal" title="Save">
-                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="onSave:" destination="XCz-SB-x1F" eventType="touchUpInside" id="sow-JZ-aYT"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Settings" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tOC-qR-3Xk">
                                 <rect key="frame" x="16" y="34" width="343" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -158,6 +151,18 @@
                                 <color key="textColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eHq-Jc-CCB">
+                                <rect key="frame" x="16" y="544" width="343" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                <state key="normal" title="Retry">
+                                    <color key="titleColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="onRetry:" destination="XCz-SB-x1F" eventType="touchUpInside" id="b4J-LM-7sD"/>
+                                    <action selector="onSave:" destination="XCz-SB-x1F" eventType="touchUpInside" id="8LV-rT-fhW"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
                         <viewLayoutGuide key="safeArea" id="VWS-L6-neQ"/>
@@ -166,7 +171,7 @@
                     <navigationItem key="navigationItem" id="OA5-MO-7J5"/>
                     <connections>
                         <outlet property="acceleration" destination="qa9-OX-E3E" id="tJO-7z-ZfZ"/>
-                        <outlet property="saveButton" destination="2Fv-UM-1Pv" id="CYf-v4-6px"/>
+                        <outlet property="retryButton" destination="eHq-Jc-CCB" id="3nM-uY-5Oj"/>
                         <outlet property="speedInput" destination="gjx-hH-frM" id="zeD-fI-Vg2"/>
                         <outlet property="stepsInput" destination="609-ce-VOD" id="Tea-PE-dff"/>
                     </connections>
@@ -269,13 +274,18 @@
                                 <color key="textColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Loading..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Z3j-EE-EpH">
-                                <rect key="frame" x="16" y="551" width="343" height="32"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ueS-4S-Bqc">
+                                <rect key="frame" x="17" y="545" width="343" height="50"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
-                                <color key="textColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                <state key="normal" title="Retry">
+                                    <color key="titleColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="onRetry:" destination="mFV-OF-a8L" eventType="touchUpInside" id="tSK-K3-kyO"/>
+                                    <action selector="onSave:" destination="XCz-SB-x1F" eventType="touchUpInside" id="wk6-U7-IPT"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
                         <viewLayoutGuide key="safeArea" id="8g6-pP-y18"/>
@@ -284,6 +294,9 @@
                     <navigationItem key="navigationItem" id="zrg-fY-Tha">
                         <barButtonItem key="rightBarButtonItem" title="More options" id="QFS-gx-VMI"/>
                     </navigationItem>
+                    <connections>
+                        <outlet property="retryButton" destination="ueS-4S-Bqc" id="xlD-uf-Sf2"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FJn-d1-mmj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
