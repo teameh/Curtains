@@ -83,7 +83,7 @@
                         <color key="backgroundColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
                         <viewLayoutGuide key="safeArea" id="nUi-Cy-NsI"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Sunrise" id="Y1i-5I-v43"/>
+                    <tabBarItem key="tabBarItem" title="Sunrise" image="sun" id="Y1i-5I-v43"/>
                     <navigationItem key="navigationItem" id="PDT-Ry-zxf">
                         <barButtonItem key="rightBarButtonItem" title="More options" id="pIP-yN-baK"/>
                     </navigationItem>
@@ -191,7 +191,7 @@
                         <color key="backgroundColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
                         <viewLayoutGuide key="safeArea" id="VWS-L6-neQ"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Settings" id="XzB-P6-jMx"/>
+                    <tabBarItem key="tabBarItem" title="Settings" image="settings" id="XzB-P6-jMx"/>
                     <navigationItem key="navigationItem" id="OA5-MO-7J5"/>
                     <connections>
                         <outlet property="accelerationInput" destination="qa9-OX-E3E" id="ywM-oR-hfB"/>
@@ -338,7 +338,7 @@
                         <color key="backgroundColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
                         <viewLayoutGuide key="safeArea" id="8g6-pP-y18"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Actions" id="lXf-wu-EUJ"/>
+                    <tabBarItem key="tabBarItem" title="Actions" image="rocket" id="lXf-wu-EUJ"/>
                     <navigationItem key="navigationItem" id="zrg-fY-Tha">
                         <barButtonItem key="rightBarButtonItem" title="More options" id="QFS-gx-VMI"/>
                     </navigationItem>
@@ -352,4 +352,9 @@
             <point key="canvasLocation" x="1521" y="222"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="rocket" width="30" height="30"/>
+        <image name="settings" width="30" height="30"/>
+        <image name="sun" width="30" height="30"/>
+    </resources>
 </document>

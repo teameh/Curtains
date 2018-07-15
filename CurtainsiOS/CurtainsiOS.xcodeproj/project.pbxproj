@@ -21,7 +21,6 @@
 		527840EE20F1649F00E05246 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527840ED20F1649F00E05246 /* AppDelegate.swift */; };
 		527840F020F1649F00E05246 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527840EF20F1649F00E05246 /* ViewController.swift */; };
 		527840F320F1649F00E05246 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 527840F120F1649F00E05246 /* Main.storyboard */; };
-		527840F520F164A100E05246 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 527840F420F164A100E05246 /* Assets.xcassets */; };
 		527840F820F164A100E05246 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 527840F620F164A100E05246 /* LaunchScreen.storyboard */; };
 		5278410320F164A200E05246 /* CurtainsiOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5278410220F164A200E05246 /* CurtainsiOSTests.swift */; };
 		5278410E20F164A200E05246 /* CurtainsiOSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5278410D20F164A200E05246 /* CurtainsiOSUITests.swift */; };
@@ -294,7 +293,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				527840F820F164A100E05246 /* LaunchScreen.storyboard in Resources */,
-				527840F520F164A100E05246 /* Assets.xcassets in Resources */,
 				527840F320F1649F00E05246 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

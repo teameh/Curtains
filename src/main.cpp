@@ -134,7 +134,7 @@ void startSunrise() {
 }
 
 void checkSunRise() {
-  if(hour() == sunriseHour && minute() == sunriseMinutes) {
+  if(isEnabled && hour() == sunriseHour && minute() == sunriseMinutes) {
     startSunrise();
   } 
 }
@@ -191,6 +191,7 @@ void setupWifi() {
   // Connect to WiFi network
   Serial.println();
   Serial.println();
+  Serial.println("- setupWifi");
   Serial.print("Connecting to ");
   Serial.println(ssid);
 
@@ -229,13 +230,13 @@ void loopWiFi() {
 }
 
 void jsonResponse(int code, const String &content) {
-  Serial.println("response:");
-  Serial.print(content);
+  Serial.println("jsonResponse:");
+  Serial.println(content);
   server.send(code, "application/json", content);
 }
 
 void handleEchoQueryArgumentsAsJSON() {
-  Serial.println("handleEchoQueryArgumentsAsJSON");
+  Serial.println("- handleEchoQueryArgumentsAsJSON");
 
   StaticJsonBuffer<256> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
@@ -250,7 +251,7 @@ void handleEchoQueryArgumentsAsJSON() {
 }
 
 void handleSettings () {
-  Serial.println("handleSettings");
+  Serial.println("- handleSettings");
 
   int newSteps = server.arg("steps").toInt();
   int newSpeed = server.arg("speed").toInt();
@@ -284,7 +285,7 @@ void handleSettings () {
 }
 
 void handleSunrise () {
-  Serial.println("handleSunrise");
+  Serial.println("- handleSunrise");
 
   int newIsEnabled = server.arg("isEnabled").toInt();
   float newAmount = server.arg("amount").toFloat();
@@ -339,7 +340,7 @@ void handleSunrise () {
 }
 
 void handleOpen () {
-  Serial.println("handleOpen");
+  Serial.println("- handleOpen");
 
   float openAmount = server.arg("amount").toFloat();
   int stepsToRotate = openAmount * steps;
@@ -364,8 +365,6 @@ void handleOpen () {
     return;
   }
 
-  Serial.print("Open curtains: steps to rotate:");
-  Serial.print(stepsToRotate);
   enableOutputs();
   setMaxSpeed(speed);
   setAcceleration(acceleration);
@@ -378,7 +377,7 @@ void handleOpen () {
 }
 
 void handleStop () {
-  Serial.println("handleStop");
+  Serial.println("- handleStop");
 
   StaticJsonBuffer<256> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
@@ -413,7 +412,7 @@ void setupTimeSync() {
 
 void sendNTPpacket(IPAddress& address)
 {
-  Serial.println("sending NTP packet...");
+  Serial.println("- sendNTPpacket");
   memset(packetBuffer, 0, NTP_PACKET_SIZE);
   packetBuffer[0] = 0b11100011;   // LI, Version, Mode
   packetBuffer[1] = 0;     // Stratum, or type of clock
@@ -430,6 +429,7 @@ void sendNTPpacket(IPAddress& address)
 
 time_t getNtpTime()
 {
+  Serial.println("- getNtpTime");
   WiFi.hostByName(ntpServerName, timeServerIP); 
   sendNTPpacket(timeServerIP);
   delay(500);
@@ -445,7 +445,7 @@ time_t getNtpTime()
     secsSince1900 |= (unsigned long)packetBuffer[42] << 8;
     secsSince1900 |= (unsigned long)packetBuffer[43];
     unsigned long epoch  = secsSince1900 - 2208988800UL + secondsGtmOffset;
-    Serial.print("epoch: ");
+    Serial.print("UNIX epoch: ");
     Serial.println(epoch);
     return epoch;
   }
