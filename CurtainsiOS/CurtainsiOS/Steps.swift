@@ -8,9 +8,9 @@
 
 import Foundation
 
-enum Steps: String {
-    case full = "full"
-    case threeQuarters = "threeQuarters"
-    case half = "half"
-    case quarter = "quarter"
+enum Steps: Float {
+    case full = 1.00
+    case threeQuarters = 0.75
+    case half = 0.50
+    case quarter = 0.25
 }

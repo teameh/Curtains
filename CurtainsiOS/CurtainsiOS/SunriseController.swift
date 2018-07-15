@@ -16,7 +16,6 @@ class SunriseController: RequestController {
     @IBOutlet weak var amountPicker: UISegmentedControl!
 
     var throttleTimer: Timer?
-    let dateFormatter = DateFormatter()
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -25,7 +24,6 @@ class SunriseController: RequestController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        dateFormatter.dateFormat = "HH/mm"
     }
 
     @IBAction func onChangeValue(_ sender: Any) {
@@ -54,24 +52,32 @@ class SunriseController: RequestController {
             Steps.quarter,
         ]
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH/mm"
+        let components = Calendar.current.dateComponents([.hour, .minute], from: timePicker.date)
+        guard let hour = components.hour, let minutes = components.minute else {
+            self.onLoading(status: "Invalid time")
+            return
+        }
 
-        var url = "http://192.168.2.22/sunrise/"
-        url += "\(self.sunriseSwitch.isOn ? "on" : "off")/"
-        url += "\(amounts[amountPicker.selectedSegmentIndex].rawValue)/"
-        url += "\(dateFormatter.string(from: timePicker.date))/"
+        let url = "http://192.168.2.22/sunrise"
+        let parameters: Parameters = [
+            "isEnabled": self.sunriseSwitch.isOn,
+            "amount": amounts[amountPicker.selectedSegmentIndex].rawValue,
+            "hour": hour,
+            "minutes": minutes,
+            "currentTime": NSDate().timeIntervalSince1970
+        ]
 
-        Alamofire.request(url)
+        Alamofire.request(url, parameters: parameters)
             .validate()
             .responseJSON { response in
-                print("request \(url) \(response.result.isSuccess ? "success" : "failure")");
+                print("request \(response.response!.statusCode) - \(response.request!.url!) \(String(describing: response.result.value))");
 
                 switch response.result {
                 case .success:
                     self.onSuccess(status: "Saved")
                     self.storeValues()
                 case .failure(let err):
+                    
                     self.onFailure(status: "Request failed... \(err.localizedDescription)", action: #selector(self.sendRequest))
                 }
         }

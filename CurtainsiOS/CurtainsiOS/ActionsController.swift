@@ -34,12 +34,12 @@ class ActionsController: RequestController {
     @IBAction func onStop(_ sender: Any) {
         self.onLoading(status: "Loading...")
         
-        let url = "http://192.168.2.22/stop/";
+        let url = "http://192.168.2.22/stop";
         Alamofire.request(url)
             .validate()
             .responseJSON { response in
-                print("request \(url) \(response.result.isSuccess ? "success" : "failure")");
-                
+                print("request \(response.response!.statusCode) - \(response.request!.url!) \(String(describing: response.result.value))");
+
                 switch response.result {
                 case .success:
                     self.onSuccess(status: "Stopping motor")
@@ -51,13 +51,14 @@ class ActionsController: RequestController {
     
     func sendOpenRequest(steps: Steps, onRetry: Selector) {
         self.onLoading(status: "Loading...")
-        
-        let url = "http://192.168.2.22/open/\(steps.rawValue)/";
-        Alamofire.request(url)
+
+        let url = "http://192.168.2.22/open"
+        Alamofire.request(url, parameters: [ "amount": steps.rawValue ])
             .validate()
             .responseJSON { response in
-                print("request \(url) \(response.result.isSuccess ? "success" : "failure")");
-                
+
+                print("request \(response.response!.statusCode) - \(response.request!.url!) \(String(describing: response.result.value))");
+
                 switch response.result {
                 case .success:
                     self.onSuccess(status: "Opening curtain!")

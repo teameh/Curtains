@@ -4,3 +4,9 @@
 [submodule "lib/time"]
 	path = lib/time
 	url = git@github.com:PaulStoffregen/Time.git
+[submodule "lib/Arduino-EEPROMEx"]
+	path = lib/Arduino-EEPROMEx
+	url = https://github.com/thijse/Arduino-EEPROMEx.git
+[submodule "lib/ArduinoJson"]
+	path = lib/ArduinoJson
+	url = https://github.com/bblanchon/ArduinoJson.git

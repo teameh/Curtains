@@ -1,4 +1,6 @@
 #include <Arduino.h>
+
+// https://github.com/PaulStoffregen/Time
 #include <TimeLib.h>
 
 // http://www.airspayce.com/mikem/arduino/AccelStepper/
@@ -9,13 +11,10 @@
 
 // https://github.com/esp8266/Arduino
 #include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
 
-
-
-
-
-
-
+// https://github.com/bblanchon/ArduinoJson
+#include <ArduinoJson.h>
 
 
 
@@ -36,12 +35,11 @@
 SerialCommand sCmd;
 
 AccelStepper motor(AccelStepper::DRIVER, motorStepPin, motorDirPin);
-int loopCounter = 0;
 int switchValue = LOW;
 
 // ---------------- params -----------------
 
-int getParam() {
+int getSerialParam() {
   char *arg = sCmd.next();
   if (arg == NULL) {
     return 0;
@@ -51,14 +49,14 @@ int getParam() {
 }
 
 void setNextParamAsMaxSpeed() {
-  int value = getParam();
+  int value = getSerialParam();
   Serial.print("motor.setMaxSpeed: ");
   Serial.println(value);
   motor.setMaxSpeed(value);
 }
 
 void setNextParamAsAcceleration() {
-  int value = getParam();
+  int value = getSerialParam();
   Serial.print("motor.setAcceleration: ");
   Serial.println(value);
   motor.setAcceleration(value);
@@ -112,7 +110,7 @@ void rotateSteps() {
   motor.enableOutputs();
   motor.setCurrentPosition(0);
 
-  int steps = getParam();
+  int steps = getSerialParam();
   Serial.print("motor.moveTo: ");
   Serial.println(steps);
   motor.moveTo(steps);
@@ -169,6 +167,7 @@ void setupMotor(){
     pinMode(motorStepPin, OUTPUT);
 
     motor.setEnablePin(motorOnOffPin);
+    motor.disableOutputs();
     setDefaultParams();
 
     sCmd.addCommand("STEPS", rotateSteps);
@@ -194,9 +193,14 @@ void loopMotor()
 	    motor.disableOutputs();
     }
 
+    if(hour() == sunriseHour && minute() == sunriseMinutes) {
+      Serial.print("sunrise time");
+      motor.enableOutputs();
+      motor.setCurrentPosition(0);
+      motor.moveTo(stepsToPerformLater);
+    }
+
     motor.run();
-    
-    // checkSwitch();
 }
 
 
@@ -211,12 +215,25 @@ void loopMotor()
 
 const char* ssid     = "H369AB21CAF";
 const char* password = "9DA66C3A229E";
-int stepsToPerformLater = 0;
-time_t timeToPerformSteps = 0;
+
+int steps = 45000;
+int speed = 5000;
+int acceleration = 5000;
+
+bool isEnabled = false;
+float amount = 0.75;
+int sunriseHour = 8;
+int sunriseMinutes = 0;
 
 // Create an instance of the server
 // specify the port to listen on as an argument
-WiFiServer server(80);
+ESP8266WebServer server(80);
+
+void handleEchoQueryArgumentsAsJSON();
+void handleSettings ();
+void handleSunrise ();
+void handleOpen ();
+void handleStop ();
 
 void setupWifi() {
   // Connect to WiFi network
@@ -230,11 +247,22 @@ void setupWifi() {
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
+    // Signal wifi is not connected
+    digitalWrite(0, HIGH);
     Serial.print(".");
   }
 
+  // Signal wifi is connected
+  digitalWrite(0, LOW);
+
   Serial.println("");
   Serial.println("WiFi connected");
+
+  server.on("/echo", handleEchoQueryArgumentsAsJSON);
+  server.on("/settings", handleSettings);
+  server.on("/sunrise", handleSunrise);
+  server.on("/open", handleOpen);
+  server.on("/stop", handleStop);
 
   // Start the server
   server.begin();
@@ -244,92 +272,163 @@ void setupWifi() {
   Serial.println(WiFi.localIP());
 }
 
-void checkRequestForStepsCommand (WiFiClient client, String req);
-
 void loopWiFi() {
-  // Check if a client has connected
-  WiFiClient client = server.available();
-  if (!client) {
+  server.handleClient();    //Handling of incoming requests
+}
+
+void jsonResponse(int code, const String &content) {
+  Serial.println("response:");
+  Serial.print(content);
+  server.send(code, "application/json", content);
+}
+
+void handleEchoQueryArgumentsAsJSON() {
+  Serial.println("handleEchoQueryArgumentsAsJSON");
+
+  StaticJsonBuffer<256> jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
+
+  for (int i = 0; i < server.args(); i++) {
+    json[server.argName(i)] = server.arg(i);
+  } 
+
+  String jsonStr;
+  json.prettyPrintTo(jsonStr);
+  jsonResponse(200, jsonStr);
+}
+
+void handleSettings () {
+  Serial.println("handleSettings");
+
+  int newSteps = server.arg("steps").toInt();
+  int newSpeed = server.arg("steps").toInt();
+  int newAcceleration = server.arg("steps").toInt();
+
+  StaticJsonBuffer<256> jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
+
+  json["url"] = server.uri();
+  json["steps"] = steps;
+  json["speed"] = speed;
+  json["acceleration"] = acceleration;
+
+  if(newSteps < 1 || newSpeed < 1 || newAcceleration < 1) {
+    json["error"] = "Invalid request data";
+
+    String jsonStr;
+    json.prettyPrintTo(jsonStr);
+    jsonResponse(400, jsonStr);
     return;
   }
 
-  // Wait until the client sends some data
-  Serial.println("new client");
-  while (!client.available()) {
-    delay(1);
-  }
+  steps = newSteps;
+  speed = newSpeed;
+  acceleration = newAcceleration;
 
-  // Read the first line of the request
-  String req = client.readStringUntil('\r');
-  Serial.println(req);
-  client.flush();
+  String jsonStr;
+  json.prettyPrintTo(jsonStr);
+  jsonResponse(200, jsonStr);
+}
 
-  checkRequestForStepsCommand(client, req);
+void handleSunrise () {
+  Serial.println("handleSunrise");
+
+  int newIsEnabled = server.arg("isEnabled").toInt();
+  float newAmount = server.arg("amount").toFloat();
+  int newSunriseHour = server.arg("hour").toInt();
+  int newSunriseMinutes = server.arg("minutes").toInt();
+  int currentTime = server.arg("currentTime").toInt();
   
-  Serial.println("Client disonnected");
+  StaticJsonBuffer<256> jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
 
-  // The client will actually be disconnected
-  // when the function returns and 'client' object is detroyed
-}
+  json["url"] = server.uri();
+  json["isEnabled"] = isEnabled;
+  json["amount"] = amount;
+  json["sunriseHour"] = sunriseHour;
+  json["sunriseMinutes"] = sunriseMinutes;
+  json["currentTime"] = currentTime;
 
-void checkRequestForStepsCommand (WiFiClient client, String req) {
-  String reqPrefix = "/steps/";
-  int prefixIndex = req.indexOf(reqPrefix);
-  time_t currentTime = now();
+  if(
+    newIsEnabled < 0 || newIsEnabled > 1 ||
+    amount <= 0 || amount > 1 ||
+    sunriseHour < 0 || sunriseHour > 23 || 
+    sunriseMinutes < 0 || sunriseMinutes > 59
+    currentTime > 1531677842
+  ) {
+    json["error"] = "Invalid request data";
 
-  // Match the request
-  if (prefixIndex == -1) {
-    Serial.println("invalid request");
-    client.stop();
+    String jsonStr;
+    json.prettyPrintTo(jsonStr);
+    jsonResponse(400, jsonStr);
     return;
   }
 
-  int slashIndex0 = req.indexOf('/', prefixIndex + reqPrefix.length());
-  if(slashIndex0 != -1) {
-    stepsToPerformLater = req.substring(prefixIndex + reqPrefix.length(), slashIndex0).toInt();
-  }
+  isEnabled = newIsEnabled == 1 ? true : false;
+  amount = newAmount;
+  newSunriseHour = newSunriseHour;
+  newSunriseMinutes = newSunriseMinutes;
 
-  int slashIndex1 = req.indexOf('/', slashIndex0+1);
-  int speed = 0;
-  if(slashIndex1 != -1) {
-    speed = req.substring(slashIndex0+1, slashIndex1).toInt();
-    motor.setMaxSpeed(speed);
-  }
-
-  int slashIndex2 = req.indexOf('/', slashIndex1+1);
-  int acceleration = 0;
-  if(slashIndex2 != -1) {
-    acceleration = req.substring(slashIndex1+1, slashIndex2).toInt();
-    motor.setAcceleration(acceleration);
-  }
-
-  int slashIndex3 = req.indexOf('/', slashIndex2+1);
-  int stepsDelay = 0;
-  if(slashIndex3 != -1) {
-    stepsDelay = req.substring(slashIndex2+1, slashIndex3).toInt();
-    timeToPerformSteps = currentTime + stepsDelay;
-  }
-
-  client.flush();
-
-  // Prepare the response
-  String nl = "\r\n";
-  String s = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n";
-  s += "Access-Control-Allow-Origin: *\r\n";
-  s += nl + "{";
-  s += nl + "    \"req\": \"" + req + "\",";
-  s += nl + "    \"currentTime\": "+ currentTime + ",";
-  s += nl + "    \"stepsDelay\": " + stepsDelay + ",";
-  s += nl + "    \"timeToPerformSteps\": " + timeToPerformSteps + ",";
-  s += nl + "    \"stepsToPerformLater\": " + stepsToPerformLater + ",";
-  s += nl + "    \"speed\": " + speed + ",";
-  s += nl + "    \"acceleration\": " + acceleration;
-  s += nl + "}\n";
-
-  // Send the response to the client
-  client.print(s);
-  delay(1);
+  String jsonStr;
+  json.prettyPrintTo(jsonStr);
+  jsonResponse(200, jsonStr);
 }
+
+void handleOpen () {
+  Serial.println("handleOpen");
+
+  float openAmount = server.arg("amount").toFloat();
+  int stepsToRotate = openAmount * steps;
+
+  StaticJsonBuffer<256> jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
+
+  json["url"] = server.uri();
+  json["steps"] = steps;
+  json["speed"] = speed;
+  json["acceleration"] = acceleration;
+  json["openAmount"] = openAmount;
+  json["stepsToRotate"] = stepsToRotate;
+
+  if(openAmount <= 0 || openAmount > 1) {
+    json["error"] = "Invalid request data";
+
+    String jsonStr;
+    json.prettyPrintTo(jsonStr);
+    jsonResponse(400, jsonStr);
+    return;
+  }
+
+  Serial.print("Open curtains: steps to rotate:");
+  Serial.print(stepsToRotate);
+  motor.enableOutputs();
+  motor.setMaxSpeed(speed);
+  motor.setAcceleration(acceleration);
+  motor.setCurrentPosition(0);
+  motor.moveTo(stepsToRotate);
+
+  String jsonStr;
+  json.prettyPrintTo(jsonStr);
+  jsonResponse(200, jsonStr);
+}
+
+void handleStop () {
+  Serial.println("handleStop");
+
+  StaticJsonBuffer<256> jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
+
+  json["url"] = server.uri();
+  json["stop"] = "true";
+
+  String jsonStr;
+  json.prettyPrintTo(jsonStr);
+  jsonResponse(200, jsonStr);
+  stop();
+}
+
+
+
 
 
 // ###################################################
@@ -340,6 +439,9 @@ void setup() {
   Serial.begin(115200);
   sCmd.setDefaultHandler(unrecognizedCommand);
 
+  // LED
+  pinMode(0, OUTPUT);
+
   setupMotor();
   setupWifi();
 }
@@ -347,14 +449,4 @@ void setup() {
 void loop() {
   loopMotor();
   loopWiFi();
-
-  // Check if we need to rotate now:
-  if(now() == timeToPerformSteps && stepsToPerformLater > 0) {
-    Serial.print("Time to wake up, start rotating:");
-    Serial.println(stepsToPerformLater);
-    timeToPerformSteps = 0;
-    motor.enableOutputs();
-    motor.setCurrentPosition(0);
-    motor.moveTo(stepsToPerformLater);
-  }
 }

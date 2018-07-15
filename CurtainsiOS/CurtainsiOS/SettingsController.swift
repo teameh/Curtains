@@ -61,16 +61,39 @@ class SettingsController: RequestController, UITextFieldDelegate {
     }
 
     @objc func sendRequest() {
+        guard let stepsStr = stepsInput.text, let speedStr = speedInput.text, let accelerationStr = accelerationInput.text else {
+            self.onLoading(status: "Invalid value, all inputs must be set")
+            return
+        }
+
+        guard let steps = Int(stepsStr), steps > 0 else {
+            self.onLoading(status: "Steps must be > 0")
+            return
+        }
+
+        guard let speed = Int(speedStr), steps > 0 else {
+            self.onLoading(status: "Speed must be > 0")
+            return
+        }
+
+        guard let acceleration = Int(accelerationStr), acceleration > 0 else {
+            self.onLoading(status: "Acceleration must be > 0")
+            return
+        }
+
         self.onLoading(status: "Saving...")
 
-        var url = "http://192.168.2.22/settings/\(stepsInput.text ?? "0")/"
-        url += "\(speedInput.text ?? "0")/"
-        url += "\(accelerationInput.text ?? "0")/"
+        let url = "http://192.168.2.22/settings"
+        let parameters: Parameters = [
+            "steps": steps,
+            "speed": speed,
+            "acceleration": acceleration,
+        ]
 
-        Alamofire.request(url)
+        Alamofire.request(url, parameters: parameters)
             .validate()
             .responseJSON { response in
-                print("request \(url) \(response.result.isSuccess ? "success" : "failure")");
+                print("request \(response.response!.statusCode) - \(response.request!.url!) \(String(describing: response.result.value))");
 
                 switch response.result {
                 case .success:
