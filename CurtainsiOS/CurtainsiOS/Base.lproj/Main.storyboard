@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="uoQ-bc-deq">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="zjD-SZ-NaK">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -10,90 +10,30 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Main View Controller-->
+        <!--Sunrise-->
         <scene sceneID="jzS-FP-khw">
             <objects>
-                <viewController id="uoQ-bc-deq" customClass="MainViewController" customModule="CurtainsiOS" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="uoQ-bc-deq" customClass="SunriseController" customModule="CurtainsiOS" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="KB6-1F-DjW">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Sunrise" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N0Q-tg-Yuk">
-                                <rect key="frame" x="16" y="34" width="167" height="32"/>
+                                <rect key="frame" x="16" y="34" width="255" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                 <color key="textColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="n4W-u0-e85">
-                                <rect key="frame" x="16" y="268" width="60" height="50"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="28"/>
-                                <state key="normal" title="Full">
-                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
-                                </state>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mEe-0A-mrU">
-                                <rect key="frame" x="106" y="268" width="60" height="50"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="28"/>
-                                <state key="normal" title="3/4">
-                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
-                                </state>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="prH-f0-w8t">
-                                <rect key="frame" x="208" y="268" width="60" height="50"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="28"/>
-                                <state key="normal" title="1/2">
-                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
-                                </state>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Rr-zV-BoB">
-                                <rect key="frame" x="299" y="268" width="60" height="50"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="28"/>
-                                <state key="normal" title="1/4">
-                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
-                                </state>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KIr-jD-BIb">
-                                <rect key="frame" x="16" y="433" width="343" height="50"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.83921568629999999" green="0.51764705879999995" blue="0.23921568630000001" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <state key="normal" title="Open Now">
-                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
-                                </state>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wYu-Th-DtN">
-                                <rect key="frame" x="16" y="367" width="343" height="50"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <state key="normal" title="Save">
-                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
-                                </state>
-                            </button>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hvS-Pi-TkU">
                                 <rect key="frame" x="312" y="34" width="49" height="31"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="onTintColor" red="0.1647058824" green="0.65490196079999996" blue="0.90980392160000001" alpha="1" colorSpace="calibratedRGB"/>
-                                <color key="thumbTintColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="onTintColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="thumbTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <action selector="onChangeSwitch:" destination="uoQ-bc-deq" eventType="valueChanged" id="jdk-LJ-scj"/>
+                                </connections>
                             </switch>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2af-u8-B2l">
-                                <rect key="frame" x="16" y="502" width="343" height="50"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.83921568629999999" green="0.51764705879999995" blue="0.23921568630000001" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <state key="normal" title="Stop">
-                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
-                                </state>
-                            </button>
                             <datePicker contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="time" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="Y0P-Qe-4oq">
                                 <rect key="frame" x="0.0" y="82" width="375" height="165"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -102,40 +42,59 @@
                                 <date key="date" timeIntervalSinceReferenceDate="552691570.12871003">
                                     <!--2018-07-07 21:26:10 +0000-->
                                 </date>
-                            </datePicker>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mq5-zG-fRL">
-                                <rect key="frame" x="16" y="570" width="343" height="50"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.83921568629999999" green="0.51764705879999995" blue="0.23921568630000001" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <state key="normal" title="Settings">
-                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
-                                </state>
                                 <connections>
-                                    <segue destination="XCz-SB-x1F" kind="presentation" id="Jj1-Ib-U8c"/>
+                                    <action selector="onChangeTime:" destination="uoQ-bc-deq" eventType="valueChanged" id="zrT-9w-flF"/>
                                 </connections>
-                            </button>
+                            </datePicker>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Loading..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vvq-AE-t1K">
+                                <rect key="frame" x="16" y="544" width="343" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                <color key="textColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="xcV-IJ-EUd">
+                                <rect key="frame" x="16" y="266" width="343" height="29"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="Full"/>
+                                    <segment title="3/4"/>
+                                    <segment title="1/2"/>
+                                    <segment title="1/4"/>
+                                </segments>
+                                <color key="tintColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <action selector="onChangeAmount:" destination="uoQ-bc-deq" eventType="valueChanged" id="Ntr-T2-mBM"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
                         <viewLayoutGuide key="safeArea" id="nUi-Cy-NsI"/>
                     </view>
+                    <tabBarItem key="tabBarItem" title="Sunrise" id="Y1i-5I-v43"/>
                     <navigationItem key="navigationItem" id="PDT-Ry-zxf">
                         <barButtonItem key="rightBarButtonItem" title="More options" id="pIP-yN-baK"/>
                     </navigationItem>
+                    <connections>
+                        <outlet property="amountPicker" destination="xcV-IJ-EUd" id="9fi-2a-Cv9"/>
+                        <outlet property="statusLabel" destination="vvq-AE-t1K" id="vhb-tO-9Hx"/>
+                        <outlet property="switch" destination="hvS-Pi-TkU" id="3gP-UT-q0n"/>
+                        <outlet property="timePicker" destination="Y0P-Qe-4oq" id="oM1-qr-zdM"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oEy-Ng-q6I" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1189.5999999999999" y="-564.46776611694156"/>
+            <point key="canvasLocation" x="880.79999999999995" y="221.73913043478262"/>
         </scene>
-        <!--View Controller-->
+        <!--Settings-->
         <scene sceneID="wYl-o7-pUo">
             <objects>
-                <viewController id="XCz-SB-x1F" sceneMemberID="viewController">
+                <viewController title="Settings" id="XCz-SB-x1F" customClass="SettingsController" customModule="CurtainsiOS" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="ASf-mw-CId">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="45000" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="609-ce-VOD">
+                            <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="45000" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="609-ce-VOD">
                                 <rect key="frame" x="16" y="86" width="153" height="49"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
@@ -150,7 +109,7 @@
                                 <color key="textColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="4500" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="gjx-hH-frM">
+                            <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="4500" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="gjx-hH-frM">
                                 <rect key="frame" x="16" y="159" width="117" height="49"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
@@ -165,7 +124,7 @@
                                 <color key="textColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="4500" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="qa9-OX-E3E">
+                            <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="4500" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="qa9-OX-E3E">
                                 <rect key="frame" x="16" y="238" width="117" height="49"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
@@ -188,16 +147,147 @@
                                 <state key="normal" title="Save">
                                     <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
                                 </state>
+                                <connections>
+                                    <action selector="onSave:" destination="XCz-SB-x1F" eventType="touchUpInside" id="sow-JZ-aYT"/>
+                                </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Settings" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tOC-qR-3Xk">
+                                <rect key="frame" x="16" y="34" width="343" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                <color key="textColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
                         <viewLayoutGuide key="safeArea" id="VWS-L6-neQ"/>
                     </view>
+                    <tabBarItem key="tabBarItem" title="Settings" id="XzB-P6-jMx"/>
                     <navigationItem key="navigationItem" id="OA5-MO-7J5"/>
+                    <connections>
+                        <outlet property="acceleration" destination="qa9-OX-E3E" id="tJO-7z-ZfZ"/>
+                        <outlet property="saveButton" destination="2Fv-UM-1Pv" id="CYf-v4-6px"/>
+                        <outlet property="speedInput" destination="gjx-hH-frM" id="zeD-fI-Vg2"/>
+                        <outlet property="stepsInput" destination="609-ce-VOD" id="Tea-PE-dff"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="daz-iB-v4m" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1969" y="-564"/>
+            <point key="canvasLocation" x="2159" y="222"/>
+        </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="uFB-tT-q0w">
+            <objects>
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="zjD-SZ-NaK" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="69V-BI-DQJ">
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="uoQ-bc-deq" kind="relationship" relationship="viewControllers" id="2RD-dh-ewG"/>
+                        <segue destination="mFV-OF-a8L" kind="relationship" relationship="viewControllers" id="UW0-8y-na2"/>
+                        <segue destination="XCz-SB-x1F" kind="relationship" relationship="viewControllers" id="4op-BT-B8y"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="mfu-ks-It7" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1521" y="-586"/>
+        </scene>
+        <!--Actions-->
+        <scene sceneID="Ed6-ad-Wo7">
+            <objects>
+                <viewController id="mFV-OF-a8L" customClass="ActionsController" customModule="CurtainsiOS" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="5dq-ZE-Qy6">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EYG-zN-nYU">
+                                <rect key="frame" x="16" y="90" width="343" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                                <state key="normal" title="Open full">
+                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="onOpenFull:" destination="mFV-OF-a8L" eventType="touchUpInside" id="bNh-7V-43A"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d9h-I0-bHs">
+                                <rect key="frame" x="16" y="160" width="343" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                                <state key="normal" title="Open 3/4">
+                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="onOpen34:" destination="mFV-OF-a8L" eventType="touchUpInside" id="2zH-tQ-vJE"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rSB-ie-VB0">
+                                <rect key="frame" x="16" y="232" width="343" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                                <state key="normal" title="Open 1/2">
+                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="onOpen12:" destination="mFV-OF-a8L" eventType="touchUpInside" id="5pY-fN-BZu"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9i0-U4-4dn">
+                                <rect key="frame" x="17" y="307" width="343" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                                <state key="normal" title="Open 1/4">
+                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="onOpen14:" destination="mFV-OF-a8L" eventType="touchUpInside" id="fSD-0q-zbc"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mzw-Zg-n4m">
+                                <rect key="frame" x="16" y="383" width="343" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                                <state key="normal" title="Stop">
+                                    <color key="titleColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="onStop:" destination="mFV-OF-a8L" eventType="touchUpInside" id="77J-k8-bh6"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Actions" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="M9d-1D-WPL">
+                                <rect key="frame" x="16" y="34" width="343" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                <color key="textColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Loading..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Z3j-EE-EpH">
+                                <rect key="frame" x="16" y="551" width="343" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                <color key="textColor" red="0.0039215686269999999" green="0.20784313730000001" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" red="0.98039215690000003" green="0.79215686269999996" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
+                        <viewLayoutGuide key="safeArea" id="8g6-pP-y18"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Actions" id="lXf-wu-EUJ"/>
+                    <navigationItem key="navigationItem" id="zrg-fY-Tha">
+                        <barButtonItem key="rightBarButtonItem" title="More options" id="QFS-gx-VMI"/>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="FJn-d1-mmj" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1521" y="222"/>
         </scene>
     </scenes>
 </document>

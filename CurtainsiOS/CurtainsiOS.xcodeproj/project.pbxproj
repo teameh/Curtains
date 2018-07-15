@@ -8,8 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		2F00CD2816BA9F48469249A9 /* Pods_CurtainsiOSUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7279A66D9988EAAAB65F7414 /* Pods_CurtainsiOSUITests.framework */; };
-		5267CA8820F9FF310049DB5B /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA8720F9FF310049DB5B /* MainViewController.swift */; };
-		5267CA8920F9FF310049DB5B /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA8720F9FF310049DB5B /* MainViewController.swift */; };
+		5267CA8B20FB4D000049DB5B /* SunriseController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA8A20FB4D000049DB5B /* SunriseController.swift */; };
+		5267CA8C20FB4D000049DB5B /* SunriseController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA8A20FB4D000049DB5B /* SunriseController.swift */; };
+		5267CA8E20FB4D0E0049DB5B /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA8D20FB4D0E0049DB5B /* SettingsController.swift */; };
+		5267CA8F20FB4D0E0049DB5B /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA8D20FB4D0E0049DB5B /* SettingsController.swift */; };
+		5267CA9120FB4D1B0049DB5B /* ActionsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA9020FB4D1B0049DB5B /* ActionsController.swift */; };
+		5267CA9220FB4D1B0049DB5B /* ActionsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267CA9020FB4D1B0049DB5B /* ActionsController.swift */; };
 		527840EE20F1649F00E05246 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527840ED20F1649F00E05246 /* AppDelegate.swift */; };
 		527840F020F1649F00E05246 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527840EF20F1649F00E05246 /* ViewController.swift */; };
 		527840F320F1649F00E05246 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 527840F120F1649F00E05246 /* Main.storyboard */; };
@@ -42,7 +46,9 @@
 		255BCF49CA4994B2BF019864 /* Pods-CurtainsiOSUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CurtainsiOSUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CurtainsiOSUITests/Pods-CurtainsiOSUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		31EED212BCFB111542A9276E /* Pods-CurtainsiOSUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CurtainsiOSUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-CurtainsiOSUITests/Pods-CurtainsiOSUITests.release.xcconfig"; sourceTree = "<group>"; };
 		52417CF35DB530F4AE239602 /* Pods-CurtainsiOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CurtainsiOSTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-CurtainsiOSTests/Pods-CurtainsiOSTests.release.xcconfig"; sourceTree = "<group>"; };
-		5267CA8720F9FF310049DB5B /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		5267CA8A20FB4D000049DB5B /* SunriseController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunriseController.swift; sourceTree = "<group>"; };
+		5267CA8D20FB4D0E0049DB5B /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
+		5267CA9020FB4D1B0049DB5B /* ActionsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionsController.swift; sourceTree = "<group>"; };
 		527840EA20F1649F00E05246 /* CurtainsiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CurtainsiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		527840ED20F1649F00E05246 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		527840EF20F1649F00E05246 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -118,8 +124,10 @@
 			isa = PBXGroup;
 			children = (
 				527840ED20F1649F00E05246 /* AppDelegate.swift */,
+				5267CA8A20FB4D000049DB5B /* SunriseController.swift */,
+				5267CA8D20FB4D0E0049DB5B /* SettingsController.swift */,
+				5267CA9020FB4D1B0049DB5B /* ActionsController.swift */,
 				527840EF20F1649F00E05246 /* ViewController.swift */,
-				5267CA8720F9FF310049DB5B /* MainViewController.swift */,
 				527840F120F1649F00E05246 /* Main.storyboard */,
 				527840F420F164A100E05246 /* Assets.xcassets */,
 				527840F620F164A100E05246 /* LaunchScreen.storyboard */,
@@ -379,9 +387,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5267CA8820F9FF310049DB5B /* MainViewController.swift in Sources */,
+				5267CA8E20FB4D0E0049DB5B /* SettingsController.swift in Sources */,
 				527840F020F1649F00E05246 /* ViewController.swift in Sources */,
+				5267CA8B20FB4D000049DB5B /* SunriseController.swift in Sources */,
 				527840EE20F1649F00E05246 /* AppDelegate.swift in Sources */,
+				5267CA9120FB4D1B0049DB5B /* ActionsController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -397,8 +407,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5267CA8F20FB4D0E0049DB5B /* SettingsController.swift in Sources */,
 				5278410E20F164A200E05246 /* CurtainsiOSUITests.swift in Sources */,
-				5267CA8920F9FF310049DB5B /* MainViewController.swift in Sources */,
+				5267CA8C20FB4D000049DB5B /* SunriseController.swift in Sources */,
+				5267CA9220FB4D1B0049DB5B /* ActionsController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
