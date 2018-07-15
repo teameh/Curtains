@@ -12,206 +12,17 @@
 // https://github.com/esp8266/Arduino
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <WiFiUdp.h>
 
 // https://github.com/bblanchon/ArduinoJson
 #include <ArduinoJson.h>
 
 
-
 // ###################################################
-// ################# Motor code ######################
+// ################# INIT ############################
 // ###################################################
 
-// Pins on the Huzzah microcontroller
-#define motorStepPin 4
-#define motorDirPin 5
-#define motorOnOffPin 16
-#define switchPin 14
-
-// Default settings
-#define defaultSpeed 1000
-#define defaultAcceleration 1000
-
-SerialCommand sCmd;
-
-AccelStepper motor(AccelStepper::DRIVER, motorStepPin, motorDirPin);
-int switchValue = LOW;
-
-// ---------------- params -----------------
-
-int getSerialParam() {
-  char *arg = sCmd.next();
-  if (arg == NULL) {
-    return 0;
-  }
-
-  return atoi(arg);
-}
-
-void setNextParamAsMaxSpeed() {
-  int value = getSerialParam();
-  Serial.print("motor.setMaxSpeed: ");
-  Serial.println(value);
-  motor.setMaxSpeed(value);
-}
-
-void setNextParamAsAcceleration() {
-  int value = getSerialParam();
-  Serial.print("motor.setAcceleration: ");
-  Serial.println(value);
-  motor.setAcceleration(value);
-}
-
-void setDefaultParams() {
-  motor.setMaxSpeed(defaultSpeed);
-  motor.setAcceleration(defaultAcceleration);
-}
-
-// ----------------- Helpers -----------------
-
-void motorOn() {
-  Serial.println("turn motor on");  
-  motor.enableOutputs();
-}
-
-void motorOff() {
-  Serial.println("turn motor off");  
-  motor.disableOutputs();
-}
-
-// ----------------- Commands -----------------
-
-void unrecognizedCommand(const char *command) {
-  Serial.print("- unrecognizedCommand: ");
-  Serial.println(command);
-}
-
-void setSpeed() {
-  Serial.println("- setSpeed");  
-  setNextParamAsMaxSpeed();
-}
-
-void setAcceleration() {
-  Serial.println("- setAcceleration");  
-  setNextParamAsAcceleration();
-}
-
-void stop() {
-  Serial.println("- stop");
-  Serial.println("motor.stop");
-
-  // motor.moveTo(motor.currentPosition());
-  motor.stop();
-}
-
-void rotateSteps() {
-  Serial.println("- rotateSteps");
-
-  motor.enableOutputs();
-  motor.setCurrentPosition(0);
-
-  int steps = getSerialParam();
-  Serial.print("motor.moveTo: ");
-  Serial.println(steps);
-  motor.moveTo(steps);
-}
-
-void rotateFixedSteps() {
-  Serial.println("- rotateFixedSteps");
-
-  motor.enableOutputs();
-  motor.setCurrentPosition(0);
-
-  Serial.print("motor.moveTo: ");
-  motor.moveTo(2000);
-}
-
-// ----------------- Loop Helpers -----------------
-
-
-void printSwitchValue(int switchValue) {
-    if (switchValue == HIGH) {
-      Serial.println("switchPin == HIGH");
-    }
-  
-    if (switchValue == LOW) {
-      Serial.println("switchPin == LOW");
-    }
-}
-
-void checkSwitch() {
-  // int oldValue = switchValue;
-
-  switchValue = digitalRead(switchPin);
-  digitalWrite(0, switchValue);
-
-  // if(oldValue != switchValue) {
-  //   printSwitchValue(switchValue);
-  // }
-
-  Serial.print("pins: ");
-  for (int i = 0; i < 20; i++) {
-    Serial.print(" ");
-    Serial.print(digitalRead(i));
-  }
-  Serial.println(" ");
-  
-  // printSwitchValue(switchValue);
-}
-// ----------------- Setup -----------------
-
-void setupMotor(){
-    Serial.println("- Setup start");
-
-    pinMode(0, OUTPUT);
-    pinMode(motorStepPin, OUTPUT);
-
-    motor.setEnablePin(motorOnOffPin);
-    motor.disableOutputs();
-    setDefaultParams();
-
-    sCmd.addCommand("STEPS", rotateSteps);
-
-    sCmd.addCommand("MOTOR_ON", motorOn);
-    sCmd.addCommand("MOTOR_OFF", motorOff);
-
-    sCmd.addCommand("SPEED", setSpeed);
-    sCmd.addCommand("ACCEL", setAcceleration);
-
-    sCmd.addCommand("STOP", stop);
-
-    Serial.println("- Setup end");
-}
-
-void loopMotor()
-{    
-    // Read commands
-    sCmd.readSerial();
-
-    // Auto turn motor off when it's done
-    if (motor.distanceToGo() == 0) {
-	    motor.disableOutputs();
-    }
-
-    if(hour() == sunriseHour && minute() == sunriseMinutes) {
-      Serial.print("sunrise time");
-      motor.enableOutputs();
-      motor.setCurrentPosition(0);
-      motor.moveTo(stepsToPerformLater);
-    }
-
-    motor.run();
-}
-
-
-
-
-
-
-
-// ###################################################
-// ################# Wifi code ######################
-// ###################################################
+// ----------------- WIFI ----------------------------
 
 const char* ssid     = "H369AB21CAF";
 const char* password = "9DA66C3A229E";
@@ -224,10 +35,151 @@ bool isEnabled = false;
 float amount = 0.75;
 int sunriseHour = 8;
 int sunriseMinutes = 0;
+bool sunHasJustRisen = false;
 
 // Create an instance of the server
 // specify the port to listen on as an argument
 ESP8266WebServer server(80);
+
+// ----------------- Time ----------------------------
+
+unsigned int timeSyncUDPPort = 2390;      // local port to listen for UDP packets
+IPAddress timeServerIP;
+// const char* ntpServerName = "pool.ntp.org";
+const char* ntpServerName = "time.nist.gov";
+
+const int NTP_PACKET_SIZE = 48;
+
+byte packetBuffer[NTP_PACKET_SIZE];
+WiFiUDP udp;
+
+int secondsGtmOffset = 3600; // GTM+2
+
+int prevMinute = 0;
+
+void digitalClockDisplay();
+
+// ----------------- Motor ----------------------------
+
+// Pins on the Huzzah microcontroller
+#define motorStepPin 4
+#define motorDirPin 5
+#define motorOnOffPin 16
+#define switchPin 14
+
+// Default settings
+#define defaultSpeed 1000
+#define defaultAcceleration 1000
+
+AccelStepper motor(AccelStepper::DRIVER, motorStepPin, motorDirPin);
+int switchValue = LOW;
+
+
+
+
+
+
+
+
+// ###################################################
+// ################# Motor code ######################
+// ###################################################
+
+// ----------------- Helpers -----------------
+
+void enableOutputs() {
+  Serial.println("- motor.enableOutputs");  
+  motor.enableOutputs();
+}
+
+void disableOutputs() {
+  Serial.println("- motor.disableOutputs");  
+  motor.disableOutputs();
+}
+
+void setMaxSpeed(int value) {
+  Serial.print("- motor.setMaxSpeed: ");  
+  Serial.println(value);  
+  motor.setMaxSpeed(value);
+}
+
+void setAcceleration(int value) {
+  Serial.print("- motor.setAcceleration: ");  
+  Serial.println(value);  
+  motor.setAcceleration(value);
+}
+
+void setCurrentPosition(int value) {
+  Serial.print("- motor.setCurrentPosition: ");  
+  Serial.println(value);  
+  motor.setCurrentPosition(value);
+}
+
+void moveTo(int value) {
+  Serial.print("- motor.moveTo: ");  
+  Serial.println(value);  
+  motor.moveTo(value);
+}
+
+void stop() {
+  Serial.println("- motor.stop");
+  motor.stop();
+}
+
+void startSunrise() {
+  Serial.print("- startSunrise");
+  enableOutputs();
+  setCurrentPosition(0);
+  moveTo(amount * steps);
+}
+
+void checkSunRise() {
+  if(hour() == sunriseHour && minute() == sunriseMinutes) {
+    startSunrise();
+  } 
+}
+
+// ----------------- Setup -----------------
+
+void setupMotor(){
+    Serial.println("- setupMotor");
+
+    pinMode(motorStepPin, OUTPUT);
+
+    motor.setEnablePin(motorOnOffPin);
+    disableOutputs();
+}
+
+void loopMotor()
+{     
+  if (motor.distanceToGo() == 0) {
+    // Auto turn motor off when it's done rotating
+    motor.disableOutputs();
+  }
+
+  if (timeStatus() != timeNotSet) {
+    // Only once a minute
+    if (minute() != prevMinute) {
+      prevMinute = minute();
+      digitalClockDisplay();
+      checkSunRise();
+    }
+  }
+
+  motor.run();
+}
+
+
+
+
+
+
+
+// ###################################################
+// ################# Wifi code ######################
+// ###################################################
+
+
 
 void handleEchoQueryArgumentsAsJSON();
 void handleSettings ();
@@ -301,16 +253,17 @@ void handleSettings () {
   Serial.println("handleSettings");
 
   int newSteps = server.arg("steps").toInt();
-  int newSpeed = server.arg("steps").toInt();
-  int newAcceleration = server.arg("steps").toInt();
+  int newSpeed = server.arg("speed").toInt();
+  int newAcceleration = server.arg("acceleration").toInt();
 
   StaticJsonBuffer<256> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
 
+  json["time"] = now();
   json["url"] = server.uri();
-  json["steps"] = steps;
-  json["speed"] = speed;
-  json["acceleration"] = acceleration;
+  json["steps"] = newSteps;
+  json["speed"] = newSpeed;
+  json["acceleration"] = newAcceleration;
 
   if(newSteps < 1 || newSpeed < 1 || newAcceleration < 1) {
     json["error"] = "Invalid request data";
@@ -336,25 +289,36 @@ void handleSunrise () {
   int newIsEnabled = server.arg("isEnabled").toInt();
   float newAmount = server.arg("amount").toFloat();
   int newSunriseHour = server.arg("hour").toInt();
-  int newSunriseMinutes = server.arg("minutes").toInt();
-  int currentTime = server.arg("currentTime").toInt();
-  
+  int newSunriseMinutes = server.arg("minutes").toInt();  
+
   StaticJsonBuffer<256> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
 
+  json["time"] = now();
   json["url"] = server.uri();
-  json["isEnabled"] = isEnabled;
-  json["amount"] = amount;
-  json["sunriseHour"] = sunriseHour;
-  json["sunriseMinutes"] = sunriseMinutes;
-  json["currentTime"] = currentTime;
+  json["isEnabled"] = newIsEnabled;
+  json["amount"] = newAmount;
+  json["sunriseHour"] = newSunriseHour;
+  json["sunriseMinutes"] = newSunriseMinutes;
+
+  if(server.arg("secondsGtmOffset")) {
+    String secondsGtmOffsetStr = server.arg("secondsGtmOffset");
+    int newSecondsGtmOffset = secondsGtmOffsetStr.toInt();
+    if(secondsGtmOffsetStr != "" && newSecondsGtmOffset != secondsGtmOffset) {
+      Serial.println("Timezone changed, adjust time");
+      Serial.println(newSecondsGtmOffset - secondsGtmOffset);
+      adjustTime(newSecondsGtmOffset - secondsGtmOffset);
+      secondsGtmOffset = newSecondsGtmOffset;
+    }
+
+    json["secondsGtmOffset"] = newSecondsGtmOffset;
+  }
 
   if(
     newIsEnabled < 0 || newIsEnabled > 1 ||
     amount <= 0 || amount > 1 ||
     sunriseHour < 0 || sunriseHour > 23 || 
     sunriseMinutes < 0 || sunriseMinutes > 59
-    currentTime > 1531677842
   ) {
     json["error"] = "Invalid request data";
 
@@ -366,8 +330,8 @@ void handleSunrise () {
 
   isEnabled = newIsEnabled == 1 ? true : false;
   amount = newAmount;
-  newSunriseHour = newSunriseHour;
-  newSunriseMinutes = newSunriseMinutes;
+  sunriseHour = newSunriseHour;
+  sunriseMinutes = newSunriseMinutes;
 
   String jsonStr;
   json.prettyPrintTo(jsonStr);
@@ -383,6 +347,7 @@ void handleOpen () {
   StaticJsonBuffer<256> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
 
+  json["time"] = now();
   json["url"] = server.uri();
   json["steps"] = steps;
   json["speed"] = speed;
@@ -401,11 +366,11 @@ void handleOpen () {
 
   Serial.print("Open curtains: steps to rotate:");
   Serial.print(stepsToRotate);
-  motor.enableOutputs();
-  motor.setMaxSpeed(speed);
-  motor.setAcceleration(acceleration);
-  motor.setCurrentPosition(0);
-  motor.moveTo(stepsToRotate);
+  enableOutputs();
+  setMaxSpeed(speed);
+  setAcceleration(acceleration);
+  setCurrentPosition(0);
+  moveTo(stepsToRotate);
 
   String jsonStr;
   json.prettyPrintTo(jsonStr);
@@ -418,6 +383,7 @@ void handleStop () {
   StaticJsonBuffer<256> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
 
+  json["time"] = now();
   json["url"] = server.uri();
   json["stop"] = "true";
 
@@ -431,19 +397,99 @@ void handleStop () {
 
 
 
+
+
+
+// ###################################################
+// ################# Timeserver ######################
+// ###################################################
+
+time_t getNtpTime();
+
+void setupTimeSync() {
+  udp.begin(timeSyncUDPPort);
+  setSyncProvider(getNtpTime); // will sync every 5 minutes
+}
+
+void sendNTPpacket(IPAddress& address)
+{
+  Serial.println("sending NTP packet...");
+  memset(packetBuffer, 0, NTP_PACKET_SIZE);
+  packetBuffer[0] = 0b11100011;   // LI, Version, Mode
+  packetBuffer[1] = 0;     // Stratum, or type of clock
+  packetBuffer[2] = 6;     // Polling Interval
+  packetBuffer[3] = 0xEC;  // Peer Clock Precision
+  packetBuffer[12]  = 49;
+  packetBuffer[13]  = 0x4E;
+  packetBuffer[14]  = 49;
+  packetBuffer[15]  = 52;
+  udp.beginPacket(address, 123); //NTP requests are to port 123
+  udp.write(packetBuffer, NTP_PACKET_SIZE);
+  udp.endPacket();
+}
+
+time_t getNtpTime()
+{
+  WiFi.hostByName(ntpServerName, timeServerIP); 
+  sendNTPpacket(timeServerIP);
+  delay(500);
+  int cb = udp.parsePacket();
+  if (!cb) {
+    delay(1);
+  } else {
+    udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
+    unsigned long secsSince1900;
+    // convert four bytes starting at location 40 to a long integer
+    secsSince1900 =  (unsigned long)packetBuffer[40] << 24;
+    secsSince1900 |= (unsigned long)packetBuffer[41] << 16;
+    secsSince1900 |= (unsigned long)packetBuffer[42] << 8;
+    secsSince1900 |= (unsigned long)packetBuffer[43];
+    unsigned long epoch  = secsSince1900 - 2208988800UL + secondsGtmOffset;
+    Serial.print("epoch: ");
+    Serial.println(epoch);
+    return epoch;
+  }
+
+  Serial.println("No NTP Response :-(");
+  return 0; // return 0 if unable to get the time
+}
+
+void printDigits(int digits){
+  // utility for digital clock display: prints preceding colon and leading 0
+  Serial.print(":");
+  if(digits < 10)
+    Serial.print('0');
+  Serial.print(digits);
+}
+
+void digitalClockDisplay(){
+  Serial.print(year()); 
+  Serial.print("-");
+  Serial.print(month());
+  Serial.print("-");
+  Serial.print(day());  
+  Serial.print("-");
+  Serial.print(hour());
+  printDigits(minute());
+  printDigits(second());
+  Serial.println(); 
+}
+
+
+
 // ###################################################
 // ################# Main ############################
 // ###################################################
 
 void setup() {
   Serial.begin(115200);
-  sCmd.setDefaultHandler(unrecognizedCommand);
 
   // LED
   pinMode(0, OUTPUT);
 
   setupMotor();
   setupWifi();
+  setupTimeSync();
 }
 
 void loop() {

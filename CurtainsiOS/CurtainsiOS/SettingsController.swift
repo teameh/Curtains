@@ -32,12 +32,12 @@ class SettingsController: RequestController, UITextFieldDelegate {
     }
 
     func textFieldDidEndEditing(_ textField: UITextField) {
-        self.sendRequest()
+        self.sendRequestThrottled()
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         view.endEditing(true)
-        self.sendRequest()
+        self.sendRequestThrottled()
         return true;
     }
 
@@ -47,9 +47,7 @@ class SettingsController: RequestController, UITextFieldDelegate {
         return (string == filtered)
     }
 
-    @IBAction func onChangeValue(_ sender: Any) {
-        self.sendRequest()
-
+    func sendRequestThrottled() {
         throttleTimer?.invalidate()
         throttleTimer = Timer.scheduledTimer(
             timeInterval: 0.5,

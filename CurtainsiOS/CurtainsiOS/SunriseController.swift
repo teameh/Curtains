@@ -27,8 +27,6 @@ class SunriseController: RequestController {
     }
 
     @IBAction func onChangeValue(_ sender: Any) {
-        self.sendRequest()
-
         timePicker.isEnabled = sunriseSwitch.isOn
         amountPicker.isEnabled = sunriseSwitch.isOn
 
@@ -64,7 +62,7 @@ class SunriseController: RequestController {
             "amount": amounts[amountPicker.selectedSegmentIndex].rawValue,
             "hour": hour,
             "minutes": minutes,
-            "currentTime": NSDate().timeIntervalSince1970
+            "secondsGtmOffset": TimeZone.current.secondsFromGMT()
         ]
 
         Alamofire.request(url, parameters: parameters)
