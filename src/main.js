@@ -20,7 +20,7 @@ port.on("error", function(err) {
   console.log("Error: ", err.message);
 });
 
-port.on("open", () => console.log("Port open"));
+port.on("open", () => console.log("Serial port open"));
 
 parser.on("data", console.log);
 

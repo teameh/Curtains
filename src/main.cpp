@@ -36,6 +36,7 @@ float amount = 0.75;
 int sunriseHour = 8;
 int sunriseMinutes = 0;
 bool sunHasJustRisen = false;
+bool prevIsRunning = false;
 
 // Create an instance of the server
 // specify the port to listen on as an argument
@@ -43,21 +44,21 @@ ESP8266WebServer server(80);
 
 // ----------------- Time ----------------------------
 
-unsigned int timeSyncUDPPort = 2390;      // local port to listen for UDP packets
+#define LOCAL_UDP_PORT 2390 // local port to listen for UDP packets
+#define NTP_PACKET_SIZE 48
 IPAddress timeServerIP;
-// const char* ntpServerName = "pool.ntp.org";
 const char* ntpServerName = "time.nist.gov";
-
-const int NTP_PACKET_SIZE = 48;
-
 byte packetBuffer[NTP_PACKET_SIZE];
 WiFiUDP udp;
+WiFiUDP Udp;
 
-int secondsGtmOffset = 3600; // GTM+2
-
+int secondsGtmOffset = 3600; // GTM+1
 int prevMinute = 0;
+int prevSecond = 0;
+int timeSyncFailCount = 0;
+int timeSyncInterval = 10; // start with every ten seconds until we're synced.
 
-void digitalClockDisplay();
+void printDateTime();
 
 // ----------------- Motor ----------------------------
 
@@ -88,36 +89,42 @@ int switchValue = LOW;
 // ----------------- Helpers -----------------
 
 void enableOutputs() {
-  Serial.println("- motor.enableOutputs");  
+  Serial.println("- motor.enableOutputs");
   motor.enableOutputs();
 }
 
 void disableOutputs() {
-  Serial.println("- motor.disableOutputs");  
+  Serial.println("- motor.disableOutputs");
   motor.disableOutputs();
 }
 
 void setMaxSpeed(int value) {
-  Serial.print("- motor.setMaxSpeed: ");  
-  Serial.println(value);  
+  Serial.print("- motor.setMaxSpeed: ");
+  Serial.println(value);
   motor.setMaxSpeed(value);
 }
 
 void setAcceleration(int value) {
-  Serial.print("- motor.setAcceleration: ");  
-  Serial.println(value);  
+  Serial.print("- motor.setAcceleration: ");
+  Serial.println(value);
   motor.setAcceleration(value);
 }
 
+void setMotorDefaults() {
+  Serial.println("- setMotorDefaults");
+  setMaxSpeed(speed);
+  setAcceleration(acceleration);
+}
+
 void setCurrentPosition(int value) {
-  Serial.print("- motor.setCurrentPosition: ");  
-  Serial.println(value);  
+  Serial.print("- motor.setCurrentPosition: ");
+  Serial.println(value);
   motor.setCurrentPosition(value);
 }
 
 void moveTo(int value) {
-  Serial.print("- motor.moveTo: ");  
-  Serial.println(value);  
+  Serial.print("- motor.moveTo: ");
+  Serial.println(value);
   motor.moveTo(value);
 }
 
@@ -127,7 +134,8 @@ void stop() {
 }
 
 void startSunrise() {
-  Serial.print("- startSunrise");
+  Serial.println("- startSunrise");
+  stop();
   enableOutputs();
   setCurrentPosition(0);
   moveTo(amount * steps);
@@ -136,7 +144,7 @@ void startSunrise() {
 void checkSunRise() {
   if(isEnabled && hour() == sunriseHour && minute() == sunriseMinutes) {
     startSunrise();
-  } 
+  }
 }
 
 // ----------------- Setup -----------------
@@ -148,25 +156,18 @@ void setupMotor(){
 
     motor.setEnablePin(motorOnOffPin);
     disableOutputs();
+    setMotorDefaults();
+    Serial.flush();
 }
 
 void loopMotor()
-{     
-  if (motor.distanceToGo() == 0) {
+{
+  bool isRunning = motor.run();
+  if(!isRunning && prevIsRunning) {
     // Auto turn motor off when it's done rotating
-    motor.disableOutputs();
+    disableOutputs();
   }
-
-  if (timeStatus() != timeNotSet) {
-    // Only once a minute
-    if (minute() != prevMinute) {
-      prevMinute = minute();
-      digitalClockDisplay();
-      checkSunRise();
-    }
-  }
-
-  motor.run();
+  prevIsRunning = isRunning;
 }
 
 
@@ -187,29 +188,32 @@ void handleSunrise ();
 void handleOpen ();
 void handleStop ();
 
+bool wifiBlink = HIGH;
+
 void setupWifi() {
   // Connect to WiFi network
   Serial.println();
   Serial.println();
   Serial.println("- setupWifi");
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
+  Serial.printf("Connecting to %s.", ssid);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
-    delay(100);
-    // Signal wifi is not connected
-    digitalWrite(0, HIGH);
+    delay(250);
+    // blinking wifi is not connected
+    digitalWrite(0, wifiBlink);
+    if(wifiBlink) {
+      wifiBlink = wifiBlink == HIGH ? LOW : HIGH;
+    }
     Serial.print(".");
   }
 
-  // Signal wifi is connected
-  digitalWrite(0, LOW);
+  Serial.println("connected!");
 
-  Serial.println("");
-  Serial.println("WiFi connected");
+  // Signal wifi is connected
+  digitalWrite(0, HIGH);
 
   server.on("/echo", handleEchoQueryArgumentsAsJSON);
   server.on("/settings", handleSettings);
@@ -219,10 +223,9 @@ void setupWifi() {
 
   // Start the server
   server.begin();
-  Serial.println("Server started");
-
-  // Print the IP address
+  Serial.print("Webserver started, ip: http://");
   Serial.println(WiFi.localIP());
+  Serial.flush();
 }
 
 void loopWiFi() {
@@ -243,7 +246,7 @@ void handleEchoQueryArgumentsAsJSON() {
 
   for (int i = 0; i < server.args(); i++) {
     json[server.argName(i)] = server.arg(i);
-  } 
+  }
 
   String jsonStr;
   json.prettyPrintTo(jsonStr);
@@ -290,7 +293,7 @@ void handleSunrise () {
   int newIsEnabled = server.arg("isEnabled").toInt();
   float newAmount = server.arg("amount").toFloat();
   int newSunriseHour = server.arg("hour").toInt();
-  int newSunriseMinutes = server.arg("minutes").toInt();  
+  int newSunriseMinutes = server.arg("minutes").toInt();
 
   StaticJsonBuffer<256> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
@@ -318,7 +321,7 @@ void handleSunrise () {
   if(
     newIsEnabled < 0 || newIsEnabled > 1 ||
     amount <= 0 || amount > 1 ||
-    sunriseHour < 0 || sunriseHour > 23 || 
+    sunriseHour < 0 || sunriseHour > 23 ||
     sunriseMinutes < 0 || sunriseMinutes > 59
   ) {
     json["error"] = "Invalid request data";
@@ -406,8 +409,10 @@ void handleStop () {
 time_t getNtpTime();
 
 void setupTimeSync() {
-  udp.begin(timeSyncUDPPort);
-  setSyncProvider(getNtpTime); // will sync every 5 minutes
+  udp.begin(LOCAL_UDP_PORT);
+  setSyncInterval(10);
+  setSyncProvider(getNtpTime);
+  Serial.flush();
 }
 
 void sendNTPpacket(IPAddress& address)
@@ -454,6 +459,65 @@ time_t getNtpTime()
   return 0; // return 0 if unable to get the time
 }
 
+// // send an NTP request to the time server at the given address
+// void sendNTPpacket(IPAddress &address)
+// {
+//   Serial.println("- sendNTPpacket");
+//   // set all bytes in the buffer to 0
+//   memset(packetBuffer, 0, NTP_PACKET_SIZE);
+//   // Initialize values needed to form NTP request
+//   // (see URL above for details on the packets)
+//   packetBuffer[0] = 0b11100011;   // LI, Version, Mode
+//   packetBuffer[1] = 0;     // Stratum, or type of clock
+//   packetBuffer[2] = 6;     // Polling Interval
+//   packetBuffer[3] = 0xEC;  // Peer Clock Precision
+//   // 8 bytes of zero for Root Delay & Root Dispersion
+//   packetBuffer[12]  = 49;
+//   packetBuffer[13]  = 0x4E;
+//   packetBuffer[14]  = 49;
+//   packetBuffer[15]  = 52;
+//   // all NTP fields have been given values, now
+//   // you can send a packet requesting a timestamp:                 
+//   Udp.beginPacket(address, 123); //NTP requests are to port 123
+//   Udp.write(packetBuffer, NTP_PACKET_SIZE);
+//   Udp.endPacket();
+// }
+
+
+// time_t getNtpTime()
+// {
+//   Serial.println("- getNtpTime");
+  
+//   if(!timeServerIP) {
+//     Serial.print("get timeServerIP by hostname lookup...: ");
+//     WiFi.hostByName(ntpServerName, timeServerIP);
+//     Serial.println(timeServerIP);
+//   } else {
+//     Serial.print("reuse timeServerIP: ");
+//     Serial.println(timeServerIP);
+//   }
+
+//   while (Udp.parsePacket() > 0) ; // discard any previously received packets
+//   sendNTPpacket(timeServerIP);
+//   uint32_t beginWait = millis();
+//   while (millis() - beginWait < 1500) {
+//     int size = Udp.parsePacket();
+//     if (size >= NTP_PACKET_SIZE) {
+//       Serial.println("Receive NTP Response");
+//       Udp.read(packetBuffer, NTP_PACKET_SIZE);  // read packet into the buffer
+//       unsigned long secsSince1900;
+//       // convert four bytes starting at location 40 to a long integer
+//       secsSince1900 =  (unsigned long)packetBuffer[40] << 24;
+//       secsSince1900 |= (unsigned long)packetBuffer[41] << 16;
+//       secsSince1900 |= (unsigned long)packetBuffer[42] << 8;
+//       secsSince1900 |= (unsigned long)packetBuffer[43];
+//       return secsSince1900 - 2208988800UL + secondsGtmOffset;
+//     }
+//   }
+//   Serial.println("No NTP Response :-(");
+//   return 0; // return 0 if unable to get the time
+// }
+
 void printDigits(int digits){
   // utility for digital clock display: prints preceding colon and leading 0
   Serial.print(":");
@@ -462,19 +526,48 @@ void printDigits(int digits){
   Serial.print(digits);
 }
 
-void digitalClockDisplay(){
-  Serial.print(year()); 
+void printDateTime(){
+  Serial.print(year());
   Serial.print("-");
   Serial.print(month());
   Serial.print("-");
-  Serial.print(day());  
-  Serial.print("-");
+  Serial.print(day());
+  Serial.print(" ");
   Serial.print(hour());
   printDigits(minute());
   printDigits(second());
-  Serial.println(); 
+  Serial.println();
 }
 
+void decreaseTimeSyncInterval() {
+  Serial.println("- decreaseTimeSyncInterval");
+  timeSyncInterval = 5 * 60;
+  setSyncInterval(timeSyncInterval);
+  // indicate time is synced
+  digitalWrite(0, LOW);
+}
+
+
+void onceEverySecond() {
+  printDateTime();
+
+  // Decrease sync interval if time is synced or we've tried too many times
+  if(timeSyncInterval == 10 && (now() > 1514764800 || timeSyncFailCount > 10)) {
+    decreaseTimeSyncInterval();
+  }
+}
+
+void loopTimeSync() {
+  if (minute() != prevMinute) {
+    prevMinute = minute();
+    checkSunRise();
+  }
+
+  if (second() != prevSecond) {
+    prevSecond = second();
+    onceEverySecond();
+  }
+}
 
 
 // ###################################################
@@ -483,6 +576,8 @@ void digitalClockDisplay(){
 
 void setup() {
   Serial.begin(115200);
+
+  delay(2000);
 
   // LED
   pinMode(0, OUTPUT);
@@ -495,4 +590,5 @@ void setup() {
 void loop() {
   loopMotor();
   loopWiFi();
+  loopTimeSync();
 }
