@@ -56,7 +56,7 @@ class SunriseController: RequestController {
             return
         }
 
-        let url = "http://192.168.2.22/sunrise"
+        let url = "http://192.168.2.22/setSunrise"
         let parameters: Parameters = [
             "isEnabled": self.sunriseSwitch.isOn,
             "amount": amounts[amountPicker.selectedSegmentIndex].rawValue,

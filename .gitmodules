@@ -10,3 +10,6 @@
 [submodule "lib/ArduinoJson"]
 	path = lib/ArduinoJson
 	url = https://github.com/bblanchon/ArduinoJson.git
+[submodule "lib/FirebaseArduino"]
+	path = lib/FirebaseArduino
+	url = git@github.com:firebase/firebase-arduino.git

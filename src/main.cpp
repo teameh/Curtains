@@ -12,11 +12,15 @@
 // https://github.com/esp8266/Arduino
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266HTTPClient.h>
+
 #include <WiFiUdp.h>
 
 // https://github.com/bblanchon/ArduinoJson
 #include <ArduinoJson.h>
 
+// https://github.com/firebase/firebase-arduino
+#include <FirebaseArduino.h>
 
 // ###################################################
 // ################# INIT ############################
@@ -24,15 +28,15 @@
 
 // ----------------- WIFI ----------------------------
 
-const char* ssid     = "H369AB21CAF";
-const char* password = "9DA66C3A229E";
+#define WIFI_SSID "H369AB21CAF"
+#define WIFI_PASSWORD "9DA66C3A229E"
 
 int steps = 45000;
 int speed = 5000;
 int acceleration = 5000;
 
 bool isEnabled = false;
-float amount = 0.75;
+float amount = 0.25;
 int sunriseHour = 8;
 int sunriseMinutes = 0;
 bool sunHasJustRisen = false;
@@ -137,6 +141,8 @@ void startSunrise() {
   Serial.println("- startSunrise");
   stop();
   enableOutputs();
+  setMaxSpeed(speed);
+  setAcceleration(acceleration);
   setCurrentPosition(0);
   moveTo(amount * steps);
 }
@@ -171,10 +177,121 @@ void loopMotor()
 }
 
 
+// ###################################################
+// ################# Firebase   ######################
+// ###################################################
 
+// Set these to run example.
+#define FIREBASE_HOST "sunrise-9a00b.firebaseio.com"
+#define FIREBASE_AUTH "EizuhQ67ZmCuqIrt9FUeXniag5kVXPwAVhp6pxM5"
 
+int getFirebaseInt(const String& path);
+float getFirebaseFloat(const String& path);
+bool getFirebaseBool(const String& path);
+bool setFirebaseIntFloatBool(const String& path, const JsonVariant& value);
+void getPrevValuesFromFirebase();
 
+bool isStreaming = false;
 
+void setupFirebase() {
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  getPrevValuesFromFirebase();
+}
+
+void getPrevValuesFromFirebase() {
+  int newSteps = getFirebaseInt("steps");
+  if (!Firebase.failed() && newSteps > 0) {
+    steps = newSteps;
+  }
+  int newSpeed = getFirebaseInt("speed");
+  if (!Firebase.failed() && newSpeed > 0) {
+    speed = newSpeed;
+  }
+  int newAcceleration = getFirebaseInt("acceleration");
+  if (!Firebase.failed() && newAcceleration > 0){
+    acceleration = newAcceleration;
+  }
+  int newSunriseHour = getFirebaseInt("sunriseHour");
+  if (!Firebase.failed()) {
+    sunriseHour = newSunriseHour;
+  }
+  int newSunriseMinutes = getFirebaseInt("sunriseMinutes");
+  if (!Firebase.failed()) {
+    sunriseMinutes = newSunriseMinutes;
+  }
+
+  bool newIsEnabled = getFirebaseBool("isEnabled");
+  if (!Firebase.failed()) {
+    isEnabled = newIsEnabled;
+  }
+  
+  float newAmount = getFirebaseFloat("amount");
+  if (!Firebase.failed() && newAmount > 0){
+    amount = newAmount;
+  }
+}
+
+int getFirebaseInt(const String& path) {
+  Serial.print("- getFirebaseInt: ");
+  Serial.println(path);
+
+  int value = Firebase.getInt(path);
+  if (Firebase.failed()) {
+    Serial.println("Firebase get failed");
+    Serial.println(Firebase.error());
+  } else {
+    Serial.print("value: ");
+    Serial.println(value);
+  }
+  delay(1);
+  return value;
+}
+
+float getFirebaseFloat(const String& path) {
+  Serial.print("- getFirebaseInt: ");
+  Serial.println(path);
+
+  float value = Firebase.getFloat(path);
+  if (Firebase.failed()) {
+    Serial.println("Firebase get failed");
+    Serial.println(Firebase.error());
+  } else {
+    Serial.print("value: ");
+    Serial.println(value);
+  }
+  delay(1);
+  return value;
+}
+
+bool getFirebaseBool(const String& path) {
+  Serial.print("- getFirebaseInt: ");
+  Serial.println(path);
+
+  bool value = Firebase.getBool(path);
+  if (Firebase.failed()) {
+    Serial.println("Firebase get failed");
+    Serial.println(Firebase.error());
+  } else {
+    Serial.print("value: ");
+    Serial.println(value);
+  }
+  delay(1);
+  return value;
+}
+
+bool setFirebaseIntFloatBool(const String& path, const JsonVariant& value) {
+  Serial.print("- setFirebaseValue ");
+  Serial.println(path);
+
+  Firebase.set(path, value);
+  if (Firebase.failed()) {
+      Serial.print("Failed: ");
+      Serial.println(Firebase.error());  
+      return false;
+  }
+  delay(1);
+  return true;
+}
 
 // ###################################################
 // ################# Wifi code ######################
@@ -195,10 +312,10 @@ void setupWifi() {
   Serial.println();
   Serial.println();
   Serial.println("- setupWifi");
-  Serial.printf("Connecting to %s.", ssid);
+  Serial.printf("Connecting to %s.", WIFI_SSID);
 
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(250);
@@ -217,7 +334,7 @@ void setupWifi() {
 
   server.on("/echo", handleEchoQueryArgumentsAsJSON);
   server.on("/settings", handleSettings);
-  server.on("/sunrise", handleSunrise);
+  server.on("/setSunrise", handleSunrise);
   server.on("/open", handleOpen);
   server.on("/stop", handleStop);
 
@@ -260,7 +377,7 @@ void handleSettings () {
   int newSpeed = server.arg("speed").toInt();
   int newAcceleration = server.arg("acceleration").toInt();
 
-  StaticJsonBuffer<256> jsonBuffer;
+  StaticJsonBuffer<512> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
 
   json["time"] = now();
@@ -270,6 +387,26 @@ void handleSettings () {
   json["acceleration"] = newAcceleration;
 
   if(newSteps < 1 || newSpeed < 1 || newAcceleration < 1) {
+    Serial.println("Invalid request data");
+    
+    if (newSteps < 1) {
+      Serial.print("newSteps: ");
+      Serial.print(newSteps);
+      Serial.print(" is invalid");
+    }
+
+    if (newSpeed < 1) {
+      Serial.print("newSpeed: ");
+      Serial.print(newSpeed);
+      Serial.print(" is invalid");
+    }
+
+    if (newAcceleration < 1) {
+      Serial.print("newAcceleration: ");
+      Serial.print(newAcceleration);
+      Serial.print(" is invalid");
+    }
+
     json["error"] = "Invalid request data";
 
     String jsonStr;
@@ -281,6 +418,18 @@ void handleSettings () {
   steps = newSteps;
   speed = newSpeed;
   acceleration = newAcceleration;
+
+  bool success = setFirebaseIntFloatBool("steps", steps);
+  success &= setFirebaseIntFloatBool("speed", speed);
+  success &= setFirebaseIntFloatBool("acceleration", acceleration);
+
+  if(!success) {
+    json["error"] = "Firebase request failed";
+    String jsonStr;
+    json.prettyPrintTo(jsonStr);
+    jsonResponse(500, jsonStr);
+    return;
+  }
 
   String jsonStr;
   json.prettyPrintTo(jsonStr);
@@ -295,7 +444,7 @@ void handleSunrise () {
   int newSunriseHour = server.arg("hour").toInt();
   int newSunriseMinutes = server.arg("minutes").toInt();
 
-  StaticJsonBuffer<256> jsonBuffer;
+  StaticJsonBuffer<512> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
 
   json["time"] = now();
@@ -320,10 +469,36 @@ void handleSunrise () {
 
   if(
     newIsEnabled < 0 || newIsEnabled > 1 ||
-    amount <= 0 || amount > 1 ||
-    sunriseHour < 0 || sunriseHour > 23 ||
-    sunriseMinutes < 0 || sunriseMinutes > 59
+    newAmount <= 0 || newAmount > 1 ||
+    newSunriseHour < 0 || newSunriseHour > 23 ||
+    newSunriseMinutes < 0 || newSunriseMinutes > 59
   ) {
+    Serial.println("Invalid request data");
+    
+    if (newIsEnabled < 0 || newIsEnabled > 1) {
+      Serial.print("newIsEnabled: ");
+      Serial.print(newIsEnabled);
+      Serial.print(" is invalid");
+    }
+
+    if (newAmount <= 0 || newAmount > 1) {
+      Serial.print("newAmount: ");
+      Serial.print(newAmount);
+      Serial.print(" is invalid");
+    }
+
+    if (newSunriseHour < 0 || newSunriseHour > 23) {
+      Serial.print("newSunriseHour: ");
+      Serial.print(newSunriseHour);
+      Serial.print(" is invalid");
+    }
+
+    if (newSunriseMinutes < 0 || newSunriseMinutes > 5) {
+      Serial.print("newSunriseMinutes: ");
+      Serial.print(newSunriseMinutes);
+      Serial.print(" is invalid");
+    }
+
     json["error"] = "Invalid request data";
 
     String jsonStr;
@@ -336,6 +511,19 @@ void handleSunrise () {
   amount = newAmount;
   sunriseHour = newSunriseHour;
   sunriseMinutes = newSunriseMinutes;
+
+  bool success = setFirebaseIntFloatBool("isEnabled", isEnabled);
+  success &= setFirebaseIntFloatBool("amount", amount);
+  success &= setFirebaseIntFloatBool("sunriseHour", sunriseHour);
+  success &= setFirebaseIntFloatBool("sunriseMinutes", sunriseMinutes);
+
+  if(!success) {
+    json["error"] = "Firebase request failed";
+    String jsonStr;
+    json.prettyPrintTo(jsonStr);
+    jsonResponse(500, jsonStr);
+    return;
+  }
 
   String jsonStr;
   json.prettyPrintTo(jsonStr);
@@ -394,11 +582,6 @@ void handleStop () {
   jsonResponse(200, jsonStr);
   stop();
 }
-
-
-
-
-
 
 
 
@@ -500,6 +683,8 @@ void decreaseTimeSyncInterval() {
 
 void onceEverySecond() {
   printDateTime();
+  // Serial.print("- motor.speed: ");
+  // Serial.println(motor.speed());
 
   bool timeIsSynced = now() > 1514764800; // 2018
   // Decrease sync interval if time is synced or we've tried too many times
@@ -536,6 +721,7 @@ void setup() {
   setupMotor();
   setupWifi();
   setupTimeSync();
+  setupFirebase();
 }
 
 void loop() {
