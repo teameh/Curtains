@@ -11,8 +11,8 @@
 
 // https://github.com/esp8266/Arduino
 #include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
 #include <ESP8266HTTPClient.h>
+#include <ESP8266WebServer.h>
 
 #include <WiFiUdp.h>
 
@@ -31,14 +31,18 @@
 #define WIFI_SSID "H369AB21CAF"
 #define WIFI_PASSWORD "9DA66C3A229E"
 
-int steps = 45000;
-int speed = 5000;
-int acceleration = 5000;
+#define FIREBASE_HOST "sunrise-9a00b.firebaseio.com/"
+#define FIREBASE_AUTH "ksfroUlEIyqPJkxeRdmbEroSHeLavPexnSFV8B5O"
+#define SEND_TO_FIREBASE false
 
-bool isEnabled = false;
-float amount = 0.25;
-int sunriseHour = 8;
-int sunriseMinutes = 0;
+int steps = 188000;
+int speed = 100;
+int acceleration = 50;
+
+bool isEnabled = true;
+float amount = 0.333;
+int sunriseHour = 7;
+int sunriseMinutes = 45;
 bool sunHasJustRisen = false;
 bool prevIsRunning = false;
 
@@ -181,10 +185,6 @@ void loopMotor()
 // ################# Firebase   ######################
 // ###################################################
 
-// Set these to run example.
-#define FIREBASE_HOST "sunrise-9a00b.firebaseio.com"
-#define FIREBASE_AUTH "EizuhQ67ZmCuqIrt9FUeXniag5kVXPwAVhp6pxM5"
-
 int getFirebaseInt(const String& path);
 float getFirebaseFloat(const String& path);
 bool getFirebaseBool(const String& path);
@@ -224,7 +224,7 @@ void getPrevValuesFromFirebase() {
   if (!Firebase.failed()) {
     isEnabled = newIsEnabled;
   }
-  
+
   float newAmount = getFirebaseFloat("amount");
   if (!Firebase.failed() && newAmount > 0){
     amount = newAmount;
@@ -237,13 +237,13 @@ int getFirebaseInt(const String& path) {
 
   int value = Firebase.getInt(path);
   if (Firebase.failed()) {
-    Serial.println("Firebase get failed");
+    Serial.println("Firebase.error: ");
     Serial.println(Firebase.error());
   } else {
     Serial.print("value: ");
     Serial.println(value);
   }
-  delay(1);
+  yield();
   return value;
 }
 
@@ -253,13 +253,13 @@ float getFirebaseFloat(const String& path) {
 
   float value = Firebase.getFloat(path);
   if (Firebase.failed()) {
-    Serial.println("Firebase get failed");
+    Serial.println("Firebase.error: ");
     Serial.println(Firebase.error());
   } else {
     Serial.print("value: ");
     Serial.println(value);
   }
-  delay(1);
+  yield();
   return value;
 }
 
@@ -269,13 +269,13 @@ bool getFirebaseBool(const String& path) {
 
   bool value = Firebase.getBool(path);
   if (Firebase.failed()) {
-    Serial.println("Firebase get failed");
+    Serial.println("Firebase.error: ");
     Serial.println(Firebase.error());
   } else {
     Serial.print("value: ");
     Serial.println(value);
   }
-  delay(1);
+  yield();
   return value;
 }
 
@@ -285,11 +285,11 @@ bool setFirebaseIntFloatBool(const String& path, const JsonVariant& value) {
 
   Firebase.set(path, value);
   if (Firebase.failed()) {
-      Serial.print("Failed: ");
-      Serial.println(Firebase.error());  
+      Serial.println("Firebase.error: ");
+      Serial.println(Firebase.error());
       return false;
   }
-  delay(1);
+  yield();
   return true;
 }
 
@@ -346,7 +346,10 @@ void setupWifi() {
 }
 
 void loopWiFi() {
-  server.handleClient();    //Handling of incoming requests
+  // Handling of incoming requests
+  server.handleClient();
+  // Signal if wifi is connected
+  digitalWrite(0, WiFi.status() == WL_CONNECTED ? HIGH : LOW);
 }
 
 void jsonResponse(int code, const String &content) {
@@ -388,7 +391,7 @@ void handleSettings () {
 
   if(newSteps < 1 || newSpeed < 1 || newAcceleration < 1) {
     Serial.println("Invalid request data");
-    
+
     if (newSteps < 1) {
       Serial.print("newSteps: ");
       Serial.print(newSteps);
@@ -419,16 +422,18 @@ void handleSettings () {
   speed = newSpeed;
   acceleration = newAcceleration;
 
-  bool success = setFirebaseIntFloatBool("steps", steps);
-  success &= setFirebaseIntFloatBool("speed", speed);
-  success &= setFirebaseIntFloatBool("acceleration", acceleration);
+  if(SEND_TO_FIREBASE) {
+    bool success = setFirebaseIntFloatBool("steps", steps);
+    success &= setFirebaseIntFloatBool("speed", speed);
+    success &= setFirebaseIntFloatBool("acceleration", acceleration);
 
-  if(!success) {
-    json["error"] = "Firebase request failed";
-    String jsonStr;
-    json.prettyPrintTo(jsonStr);
-    jsonResponse(500, jsonStr);
-    return;
+    if(!success) {
+      json["error"] = "Firebase request failed";
+      String jsonStr;
+      json.prettyPrintTo(jsonStr);
+      jsonResponse(500, jsonStr);
+      return;
+    }
   }
 
   String jsonStr;
@@ -474,7 +479,7 @@ void handleSunrise () {
     newSunriseMinutes < 0 || newSunriseMinutes > 59
   ) {
     Serial.println("Invalid request data");
-    
+
     if (newIsEnabled < 0 || newIsEnabled > 1) {
       Serial.print("newIsEnabled: ");
       Serial.print(newIsEnabled);
@@ -512,17 +517,19 @@ void handleSunrise () {
   sunriseHour = newSunriseHour;
   sunriseMinutes = newSunriseMinutes;
 
-  bool success = setFirebaseIntFloatBool("isEnabled", isEnabled);
-  success &= setFirebaseIntFloatBool("amount", amount);
-  success &= setFirebaseIntFloatBool("sunriseHour", sunriseHour);
-  success &= setFirebaseIntFloatBool("sunriseMinutes", sunriseMinutes);
+  if(SEND_TO_FIREBASE) {
+    bool success = setFirebaseIntFloatBool("isEnabled", isEnabled);
+    success &= setFirebaseIntFloatBool("amount", amount);
+    success &= setFirebaseIntFloatBool("sunriseHour", sunriseHour);
+    success &= setFirebaseIntFloatBool("sunriseMinutes", sunriseMinutes);
 
-  if(!success) {
-    json["error"] = "Firebase request failed";
-    String jsonStr;
-    json.prettyPrintTo(jsonStr);
-    jsonResponse(500, jsonStr);
-    return;
+    if(!success) {
+      json["error"] = "Firebase request failed";
+      String jsonStr;
+      json.prettyPrintTo(jsonStr);
+      jsonResponse(500, jsonStr);
+      return;
+    }
   }
 
   String jsonStr;
@@ -618,7 +625,7 @@ void sendNTPpacket(IPAddress& address)
 time_t getNtpTime()
 {
   Serial.println("- getNtpTime");
-  
+
   if(!timeServerIP) {
     Serial.print("get timeServerIP by hostname lookup...: ");
     WiFi.hostByName(ntpServerName, timeServerIP);
